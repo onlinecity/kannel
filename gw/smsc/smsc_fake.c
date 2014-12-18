@@ -202,7 +202,7 @@ static void msg_to_bb(SMSCConn *conn, Octstr *line)
         msg->sms.boxc_id = octstr_copy(line, p + 1, p2 - p - 1);
         msg->sms.msgdata = octstr_copy(line, p2 + 1, LONG_MAX);
     }
-    else if (!octstr_compare(type, octstr_imm("udh"))) {
+    else if (!octstr_compare(type, octstr_imm("udh-data")) || !octstr_compare(type, octstr_imm("udh"))) {
         p2 = octstr_search_char(line, ' ', p + 1);
         if (p2 == -1)
             goto error;
@@ -213,6 +213,17 @@ static void msg_to_bb(SMSCConn *conn, Octstr *line)
         if (octstr_url_decode(msg->sms.msgdata) == -1 ||
             octstr_url_decode(msg->sms.udhdata) == -1)
             warning(0, "smsc_fake: url-encoded data from client looks malformed");
+    }
+    else if (!octstr_compare(type, octstr_imm("udh-text"))) {
+        p2 = octstr_search_char(line, ' ', p + 1);
+        if (p2 == -1)
+            goto error;
+        msg->sms.udhdata = octstr_copy(line, p + 1, p2 - p - 1);
+        msg->sms.msgdata = octstr_copy(line, p2 + 1, LONG_MAX);
+        if (msg->sms.coding == DC_UNDEF)
+            msg->sms.coding = DC_7BIT;
+        if (octstr_url_decode(msg->sms.udhdata) == -1)
+            warning(0, "smsc_fake: url-encoded udh data from client looks malformed");
     }
     else if (!octstr_compare(type, octstr_imm("dlr-mask"))) {
         Octstr *tmp;

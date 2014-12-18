@@ -9700,19 +9700,26 @@ test/fakesmsc -i 0.1 -m 100 "100 200 text nop" "100 300 text echo this"
     <para>The parts of a message are separated with spaces. As each message is
     taken as one argument, it must be put in quotation marks.</para>
 
-    <para>Message type must be one of the following: "text", "data" and "udh".
-    Here's an example of using each:</para>
+    <para>Message type must be one of the following: "text", "data", "ucs2", 
+    "udh-data", "udh-text", "route" and "dlr-mask".
+    Here are some examples:</para>
 
 <programlisting>
 test/fakesmsc -i 0.01 -v 1 -m 1000 "100 300 text echo this message"
 test/fakesmsc -i 0.01 -m 1000 "100 300 data echo+these+chars%03%04%7f"
-test/fakesmsc -m 1 "100 500 udh %0eudh+stuff+here main+message"
+test/fakesmsc -m 1 "100 500 udh-data %0eudh+stuff+here main+message"
 </programlisting>
 
     <para>For "text", the rest of the argument is taken as the literal
     message. For "data", the next part must be the url-encoded version of
-    the message. Space is coded as '+'. For "udh", the next 2 parts
-    are the UDH and main message. Both must be in url-encoded form.</para>
+    the message. Space is coded as '+'. For "ucs2", the next part must be the
+    url-encoded version of the message. For "udh-data", the next 2 parts
+    are the UDH and main message. Both must be in url-encoded form. For "udh-text",
+    the UDH part must be url-encoded, and the message is taken as literals.
+    For "route" both values are literal, where the first value defines the smsbox
+    route destination. For "dlr-mask" noth values are literal, where the first
+    value defines the numerical DLR event.
+    </para>
 
     <para>If multiple messages are given, fakesmsc randomly chooses
     one for each sending.</para>

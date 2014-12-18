@@ -1,4 +1,10 @@
-2014-11-18  Stipe Tolj  <stolj at kannel.org>
+2014-12-18  Stipe Tolj  <stolj at kannel.org>
+    * doc/userguide.xml: cleaning section "Fake messages" to include all types.
+    * gw/smsc/smsc_fake.c: add support for UDH + 7bit text, using types udh-data
+      and udh-text now.
+    * test/fakesmsc.c: adding reference for udh-data and udh-text types.
+    
+2014-12-18  Stipe Tolj  <stolj at kannel.org>
     * test/fakesmsc.c: add missing usage output for type 'dlr-mask'.
     
 2014-11-17  Stipe Tolj  <stolj at kannel.org>
