@@ -1,3 +1,6 @@
+2014-11-18  Stipe Tolj  <stolj at kannel.org>
+    * test/fakesmsc.c: add missing usage output for type 'dlr-mask'.
+    
 2014-11-17  Stipe Tolj  <stolj at kannel.org>
     * doc/userguide/userguide.xml: document the new graceful restarting.
     * gw/bb_http.c: add new HTTP admin URI /graceful-restart.
