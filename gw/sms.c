@@ -274,7 +274,14 @@ static Octstr *extract_msgdata_part_by_coding(Msg *msg, Octstr *split_chars,
         return extract_msgdata_part(msg->sms.msgdata, split_chars, max_part_len);
     }
 
-    /* convert to and the from gsm, so we drop all non GSM chars */
+    /*
+     * XXX TODO
+     * Convert to and the from gsm, so we drop all non GSM chars.
+     * This means effectively that we can NOT use any encoding specific
+     * characters in the SMSC module scope that are NOT in the GSM 03.38
+     * alphabet, i.e. UTF-8 0xC2 0xAE is latin1 0xAE and maps to an unknown
+     * character due to this round-trip transcoding.
+     */
     charset_utf8_to_gsm(msg->sms.msgdata);
     charset_gsm_to_utf8(msg->sms.msgdata);
 

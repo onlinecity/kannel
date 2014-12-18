@@ -1,3 +1,11 @@
+2014-12-19  Stipe Tolj  <stolj at kannel.org>
+    * gw/sms.c: add a TODO note in function extract_msgdata_part_by_coding()
+      that yields a GSM centric limitation in regards of character encoding
+      support. NLC.
+    * gw/smsc/smsc_smpp.c: use DCS handling functions to reduce code redundancy
+      on the MO side, and also support individual data_coding setting via
+      meta-data value.
+       
 2014-12-18  Stipe Tolj  <stolj at kannel.org>
     * doc/userguide.xml: cleaning section "Fake messages" to include all types.
     * gw/smsc/smsc_fake.c: add support for UDH + 7bit text, using types udh-data

@@ -425,6 +425,147 @@ error:
 }
 
 
+static void handle_mt_dcs(Octstr *short_message, int data_coding)
+{
+    /*
+     * Keep in mind that we do transcode the encoding here,
+     * but effectively we're limited to the GSM 03.38 alphabet character
+     * range, since we do a round-trip conversion from/to UTF-8/GSM in
+     * function gw/sms.c:extract_msgdata_part_by_coding().
+     *
+     * If your underlying radio network is NOT GSM, and you want to support
+     * the extended range of characters of the tables, then remove the
+     * round-trip conversion from the above mentioned function.
+     */
+    switch (data_coding) {
+        case 0x01: /* ASCII or IA5 */
+            if (charset_convert(short_message, SMPP_DEFAULT_CHARSET, "ASCII") != 0) {
+                error(0, "Failed to convert msgdata from " SMPP_DEFAULT_CHARSET " to ASCII, will leave as is");
+            }
+            break;
+        case 0x03: /* ISO-8859-1 (aka latin1) */
+            if (charset_convert(short_message, SMPP_DEFAULT_CHARSET, "LATIN1") != 0) {
+                error(0, "Failed to convert msgdata from " SMPP_DEFAULT_CHARSET " to LATIN1, will leave as is");
+            }
+            break;
+        case 0x02: /* 8 bit binary - do nothing */
+        case 0x04: /* 8 bit binary - do nothing */
+            break;
+        case 0x05: /* Japanese, JIS(X 0208-1990) */
+            if (charset_convert(short_message, SMPP_DEFAULT_CHARSET, "JIS_X0208-1990") != 0)
+                error(0, "Failed to convert msgdata from " SMPP_DEFAULT_CHARSET " to Japanese (JIS-X0208-1990), "
+                         "will leave as is");
+            break;
+        case 0x06: /* Cyrllic - iso-8859-5 */
+            if (charset_convert(short_message, SMPP_DEFAULT_CHARSET, "ISO-8859-5") != 0)
+                error(0, "Failed to convert msgdata from " SMPP_DEFAULT_CHARSET " to Cyrllic (ISO-8859-5), "
+                         "will leave as is");
+            break;
+        case 0x07: /* Hebrew iso-8859-8 */
+            if (charset_convert(short_message, SMPP_DEFAULT_CHARSET, "ISO-8859-8") != 0)
+                error(0, "Failed to convert msgdata from " SMPP_DEFAULT_CHARSET " to Hebrew (ISO-8859-8), "
+                         "will leave as is");
+            break;
+        case 0x08: /* unicode UCS-2, don't convert here anything. */
+            break;
+        case 0x0D: /* Japanese, Extended Kanji JIS(X 0212-1990) */
+            if (charset_convert(short_message, SMPP_DEFAULT_CHARSET, "JIS_X0212-1990") != 0)
+                error(0, "Failed to convert msgdata from " SMPP_DEFAULT_CHARSET " to Japanese (JIS-X0212-1990), "
+                         "will leave as is");
+            break;
+        case 0x0E: /* Korean, KS C 5601 - now called KS X 1001, convert to Unicode */
+            if (charset_convert(short_message, SMPP_DEFAULT_CHARSET, "KSC_5601") != 0 &&
+                    charset_convert(short_message, SMPP_DEFAULT_CHARSET, "KSC5636") != 0)
+                error(0, "Failed to convert msgdata from " SMPP_DEFAULT_CHARSET " to Korean (KSC_5601/KSC5636), "
+                         "will leave as is");
+            break;
+        case 0x00: /* GSM 03.38 */
+        default:
+            charset_utf8_to_gsm(short_message);
+            break;
+
+            /*
+             * don't much care about the others,
+             * you implement them if you feel like it
+             */
+    }
+}
+
+
+static void handle_mo_dcs(Msg *msg, Octstr *alt_charset, int data_coding, int esm_class)
+{
+    switch (data_coding) {
+        case 0x00: /* default SMSC alphabet */
+            /*
+             * try to convert from something interesting if specified so
+             * unless it was specified binary, i.e. UDH indicator was detected
+             */
+            if (alt_charset && msg->sms.coding != DC_8BIT) {
+                if (charset_convert(msg->sms.msgdata, octstr_get_cstr(alt_charset), SMPP_DEFAULT_CHARSET) != 0)
+                    error(0, "Failed to convert msgdata from charset <%s> to <%s>, will leave as is.",
+                          octstr_get_cstr(alt_charset), SMPP_DEFAULT_CHARSET);
+                msg->sms.coding = DC_7BIT;
+            } else { /* assume GSM 03.38 7-bit alphabet */
+                charset_gsm_to_utf8(msg->sms.msgdata);
+                msg->sms.coding = DC_7BIT;
+            }
+            break;
+        case 0x01:
+            /* ASCII/IA5 - we don't need to perform any conversion
+             * due that UTF-8's first range is exactly the ASCII table */
+            msg->sms.coding = DC_7BIT; break;
+        case 0x03: /* ISO-8859-1 - I'll convert to internal encoding */
+            if (charset_convert(msg->sms.msgdata, "ISO-8859-1", SMPP_DEFAULT_CHARSET) != 0)
+                error(0, "Failed to convert msgdata from ISO-8859-1 to " SMPP_DEFAULT_CHARSET ", will leave as is");
+            msg->sms.coding = DC_7BIT; break;
+        case 0x02: /* 8 bit binary - do nothing */
+        case 0x04: /* 8 bit binary - do nothing */
+            msg->sms.coding = DC_8BIT; break;
+        case 0x05: /* Japanese, JIS(X 0208-1990) */
+            if (charset_convert(msg->sms.msgdata, "JIS_X0208-1990", SMPP_DEFAULT_CHARSET) != 0)
+                error(0, "Failed to convert msgdata from Japanese (JIS_X0208-1990) to " SMPP_DEFAULT_CHARSET ", will leave as is");
+            msg->sms.coding = DC_7BIT; break;
+        case 0x06: /* Cyrllic - iso-8859-5, I'll convert to internal encoding */
+            if (charset_convert(msg->sms.msgdata, "ISO-8859-5", SMPP_DEFAULT_CHARSET) != 0)
+                error(0, "Failed to convert msgdata from Cyrllic (ISO-8859-5) to " SMPP_DEFAULT_CHARSET ", will leave as is");
+            msg->sms.coding = DC_7BIT; break;
+        case 0x07: /* Hebrew iso-8859-8, I'll convert to internal encoding */
+            if (charset_convert(msg->sms.msgdata, "ISO-8859-8", SMPP_DEFAULT_CHARSET) != 0)
+                error(0, "Failed to convert msgdata from Hebrew (ISO-8859-8) to " SMPP_DEFAULT_CHARSET ", will leave as is");
+            msg->sms.coding = DC_7BIT; break;
+        case 0x08: /* unicode UCS-2, yey */
+            msg->sms.coding = DC_UCS2; break;
+        case 0x0D: /* Japanese, Extended Kanji JIS(X 0212-1990) */
+            if (charset_convert(msg->sms.msgdata, "JIS_X0212-1990", SMPP_DEFAULT_CHARSET) != 0)
+                error(0, "Failed to convert msgdata from Japanese (JIS-X0212-1990) to " SMPP_DEFAULT_CHARSET ", will leave as is");
+            msg->sms.coding = DC_7BIT; break;
+        case 0x0E: /* Korean, KS C 5601 - now called KS X 1001, convert to Unicode */
+            if (charset_convert(msg->sms.msgdata, "KSC_5601", SMPP_DEFAULT_CHARSET) != 0 &&
+                    charset_convert(msg->sms.msgdata, "KSC5636", SMPP_DEFAULT_CHARSET) != 0)
+                error(0, "Failed to convert msgdata from Korean (KSC_5601/KSC5636) to " SMPP_DEFAULT_CHARSET ", will leave as is");
+            msg->sms.coding = DC_7BIT; break;
+
+            /*
+             * don't much care about the others,
+             * you implement them if you feel like it
+             */
+
+        default:
+            /*
+             * some of smsc send with dcs from GSM 03.38 , but these are reserved in smpp spec.
+             * So we just look decoded values from dcs_to_fields and if none there make our assumptions.
+             * if we have an UDH indicator, we assume DC_8BIT.
+             */
+            if (msg->sms.coding == DC_UNDEF && (esm_class & ESM_CLASS_SUBMIT_UDH_INDICATOR))
+                msg->sms.coding = DC_8BIT;
+            else if (msg->sms.coding == DC_7BIT || msg->sms.coding == DC_UNDEF) { /* assume GSM 7Bit , re-encode */
+                msg->sms.coding = DC_7BIT;
+                charset_gsm_to_utf8(msg->sms.msgdata);
+            }
+            break;
+    }
+}
+
 
 /*
  * Convert SMPP PDU to internal Msgs structure.
@@ -548,64 +689,8 @@ static Msg *pdu_to_msg(SMPP *smpp, SMPP_PDU *pdu, long *reason)
     dcs_to_fields(&msg, pdu->u.deliver_sm.data_coding);
 
     /* handle default data coding */
-    switch (pdu->u.deliver_sm.data_coding) {
-        case 0x00: /* default SMSC alphabet */
-            /*
-             * try to convert from something interesting if specified so
-             * unless it was specified binary, i.e. UDH indicator was detected
-             */
-            if (smpp->alt_charset && msg->sms.coding != DC_8BIT) {
-                if (charset_convert(msg->sms.msgdata, octstr_get_cstr(smpp->alt_charset), SMPP_DEFAULT_CHARSET) != 0)
-                    error(0, "Failed to convert msgdata from charset <%s> to <%s>, will leave as is.",
-                          octstr_get_cstr(smpp->alt_charset), SMPP_DEFAULT_CHARSET);
-                msg->sms.coding = DC_7BIT;
-            } else { /* assume GSM 03.38 7-bit alphabet */
-                charset_gsm_to_utf8(msg->sms.msgdata);
-                msg->sms.coding = DC_7BIT;
-            }
-            break;
-        case 0x01:
-        	/* ASCII/IA5 - we don't need to perform any conversion
-        	 * due that UTF-8's first range is exactly the ASCII table */
-            msg->sms.coding = DC_7BIT; break;
-        case 0x03: /* ISO-8859-1 - I'll convert to internal encoding */
-            if (charset_convert(msg->sms.msgdata, "ISO-8859-1", SMPP_DEFAULT_CHARSET) != 0)
-                error(0, "Failed to convert msgdata from ISO-8859-1 to " SMPP_DEFAULT_CHARSET ", will leave as is");
-            msg->sms.coding = DC_7BIT; break;
-        case 0x02: /* 8 bit binary - do nothing */
-        case 0x04: /* 8 bit binary - do nothing */
-            msg->sms.coding = DC_8BIT; break;
-        case 0x05: /* JIS - what do I do with that ? */
-            break;
-        case 0x06: /* Cyrllic - iso-8859-5, I'll convert to internal encoding */
-            if (charset_convert(msg->sms.msgdata, "ISO-8859-5", SMPP_DEFAULT_CHARSET) != 0)
-                error(0, "Failed to convert msgdata from cyrllic to " SMPP_DEFAULT_CHARSET ", will leave as is");
-            msg->sms.coding = DC_7BIT; break;
-        case 0x07: /* Hebrew iso-8859-8, I'll convert to internal encoding */
-            if (charset_convert(msg->sms.msgdata, "ISO-8859-8", SMPP_DEFAULT_CHARSET) != 0)
-                error(0, "Failed to convert msgdata from hebrew to " SMPP_DEFAULT_CHARSET ", will leave as is");
-            msg->sms.coding = DC_7BIT; break;
-        case 0x08: /* unicode UCS-2, yey */
-            msg->sms.coding = DC_UCS2; break;
+    handle_mo_dcs(msg, smpp->alt_charset, pdu->u.deliver_sm.data_coding, pdu->u.deliver_sm.esm_class);
 
-            /*
-             * don't much care about the others,
-             * you implement them if you feel like it
-             */
-
-        default:
-            /*
-             * some of smsc send with dcs from GSM 03.38 , but these are reserved in smpp spec.
-             * So we just look decoded values from dcs_to_fields and if none there make our assumptions.
-             * if we have an UDH indicator, we assume DC_8BIT.
-             */
-            if (msg->sms.coding == DC_UNDEF && (pdu->u.deliver_sm.esm_class & ESM_CLASS_SUBMIT_UDH_INDICATOR))
-                msg->sms.coding = DC_8BIT;
-            else if (msg->sms.coding == DC_7BIT || msg->sms.coding == DC_UNDEF) { /* assume GSM 7Bit , reencode */
-                msg->sms.coding = DC_7BIT;
-                charset_gsm_to_utf8(msg->sms.msgdata);
-            }
-    }
     msg->sms.pid = pdu->u.deliver_sm.protocol_id;
 
     /* set priority flag */
@@ -737,62 +822,7 @@ static Msg *data_sm_to_msg(SMPP *smpp, SMPP_PDU *pdu, long *reason)
     dcs_to_fields(&msg, pdu->u.data_sm.data_coding);
 
     /* handle default data coding */
-    switch (pdu->u.data_sm.data_coding) {
-        case 0x00: /* default SMSC alphabet */
-            /*
-             * try to convert from something interesting if specified so
-             * unless it was specified binary, i.e. UDH indicator was detected
-             */
-            if (smpp->alt_charset && msg->sms.coding != DC_8BIT) {
-                if (charset_convert(msg->sms.msgdata, octstr_get_cstr(smpp->alt_charset), SMPP_DEFAULT_CHARSET) != 0)
-                    error(0, "Failed to convert msgdata from charset <%s> to <%s>, will leave as is.",
-                          octstr_get_cstr(smpp->alt_charset), SMPP_DEFAULT_CHARSET);
-                msg->sms.coding = DC_7BIT;
-            } else { /* assume GSM 03.38 7-bit alphabet */
-                charset_gsm_to_utf8(msg->sms.msgdata);
-                msg->sms.coding = DC_7BIT;
-            }
-            break;
-        case 0x01: /* ASCII or IA5 - not sure if I need to do anything */
-            msg->sms.coding = DC_7BIT; break;
-        case 0x03: /* ISO-8859-1 - I'll convert to unicode */
-            if (charset_convert(msg->sms.msgdata, "ISO-8859-1", SMPP_DEFAULT_CHARSET) != 0)
-                error(0, "Failed to convert msgdata from ISO-8859-1 to " SMPP_DEFAULT_CHARSET ", will leave as is");
-            msg->sms.coding = DC_7BIT; break;
-        case 0x02: /* 8 bit binary - do nothing */
-        case 0x04: /* 8 bit binary - do nothing */
-            msg->sms.coding = DC_8BIT; break;
-        case 0x05: /* JIS - what do I do with that ? */
-            break;
-        case 0x06: /* Cyrllic - iso-8859-5, I'll convert to unicode */
-            if (charset_convert(msg->sms.msgdata, "ISO-8859-5", SMPP_DEFAULT_CHARSET) != 0)
-                error(0, "Failed to convert msgdata from cyrllic to " SMPP_DEFAULT_CHARSET ", will leave as is");
-            msg->sms.coding = DC_7BIT; break;
-        case 0x07: /* Hebrew iso-8859-8, I'll convert to unicode */
-            if (charset_convert(msg->sms.msgdata, "ISO-8859-8", SMPP_DEFAULT_CHARSET) != 0)
-                error(0, "Failed to convert msgdata from hebrew to " SMPP_DEFAULT_CHARSET ", will leave as is");
-            msg->sms.coding = DC_7BIT; break;
-        case 0x08: /* unicode UCS-2, yey */
-            msg->sms.coding = DC_UCS2; break;
-
-            /*
-             * don't much care about the others,
-             * you implement them if you feel like it
-             */
-
-        default:
-            /*
-             * some of smsc send with dcs from GSM 03.38 , but these are reserved in smpp spec.
-             * So we just look decoded values from dcs_to_fields and if none there make our assumptions.
-             * if we have an UDH indicator, we assume DC_8BIT.
-             */
-            if (msg->sms.coding == DC_UNDEF && (pdu->u.data_sm.esm_class & ESM_CLASS_SUBMIT_UDH_INDICATOR))
-                msg->sms.coding = DC_8BIT;
-            else if (msg->sms.coding == DC_7BIT || msg->sms.coding == DC_UNDEF) { /* assume GSM 7Bit , reencode */
-                msg->sms.coding = DC_7BIT;
-                charset_gsm_to_utf8(msg->sms.msgdata);
-            }
-    }
+    handle_mo_dcs(msg, smpp->alt_charset, pdu->u.data_sm.data_coding, pdu->u.data_sm.esm_class);
 
     if (msg->sms.meta_data == NULL)
         msg->sms.meta_data = octstr_create("");
@@ -829,6 +859,7 @@ static SMPP_PDU *msg_to_pdu(SMPP *smpp, Msg *msg)
     int validity;
     Octstr *tmp;
     int ton_npi_forced;
+    int data_coding = -1;
 
     pdu = smpp_pdu_create(submit_sm,
                           counter_increase(smpp->message_id_counter));
@@ -999,20 +1030,34 @@ static SMPP_PDU *msg_to_pdu(SMPP *smpp, Msg *msg)
 
     pdu->u.submit_sm.short_message = octstr_duplicate(msg->sms.msgdata);
 
+    /* Check for forced data_coding value via meta-data */
+    tmp = meta_data_get_value(msg->sms.meta_data, METADATA_SMPP_GROUP, octstr_imm("data_coding"));
+    if (tmp != NULL) {
+        data_coding = atoi(octstr_get_cstr(tmp));
+        octstr_destroy(tmp);
+    }
+
     /*
      * only re-encoding if using default smsc charset that is defined via
      * alt-charset in smsc group and if MT is not binary
      */
     if (msg->sms.coding == DC_7BIT || (msg->sms.coding == DC_UNDEF && octstr_len(msg->sms.udhdata) == 0)) {
         /*
-         * consider 3 cases:
+         * consider 4 cases:
          *  a) data_coding 0xFX: encoding should always be GSM 03.38 charset
-         *  b) data_coding 0x00: encoding may be converted according to alt-charset
-         *  c) data_coding 0x00: assume GSM 03.38 charset if alt-charset is not defined
+         *  b) data_coding 0xXX: encoding based on forced meta-data value
+         *  c) data_coding 0x00: encoding may be converted according to alt-charset
+         *  d) data_coding 0x00: assume GSM 03.38 charset if alt-charset is not defined
          */
-        if ((pdu->u.submit_sm.data_coding & 0xF0) ||
-            (pdu->u.submit_sm.data_coding == 0 && !smpp->alt_charset)) {
+        if (pdu->u.submit_sm.data_coding & 0xF0) {
             charset_utf8_to_gsm(pdu->u.submit_sm.short_message);
+        } else if (pdu->u.submit_sm.data_coding == 0 && !smpp->alt_charset) {
+            /*
+             * convert to a forced data_coding value, or GSM 03.38 if not
+             */
+            handle_mt_dcs(pdu->u.submit_sm.short_message, data_coding);
+            if (data_coding != -1)
+                pdu->u.submit_sm.data_coding = data_coding;
         } else if (pdu->u.submit_sm.data_coding == 0 && smpp->alt_charset) {
             /*
              * convert to the given alternative charset
@@ -1020,7 +1065,7 @@ static SMPP_PDU *msg_to_pdu(SMPP *smpp, Msg *msg)
             if (charset_convert(pdu->u.submit_sm.short_message, SMPP_DEFAULT_CHARSET,
                                 octstr_get_cstr(smpp->alt_charset)) != 0)
                 error(0, "Failed to convert msgdata from charset <%s> to <%s>, will send as is.",
-                             SMPP_DEFAULT_CHARSET, octstr_get_cstr(smpp->alt_charset));
+                          SMPP_DEFAULT_CHARSET, octstr_get_cstr(smpp->alt_charset));
         }
     }
 
