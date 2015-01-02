@@ -531,12 +531,6 @@ static int generic_init(SMSCConn *conn, CfgGroup *cfg)
     ConnData *conndata = conn->data;
     struct generic_values *values;
 
-    /* we need at least the criteria for a successful sent */
-    if ((os = cfg_get(cfg, octstr_imm("status-success-regex"))) == NULL) {
-        error(0, "HTTP[%s]: 'status-success-regex' required for generic http smsc",
-              octstr_get_cstr(conn->id));
-        return -1;
-    }
     conndata->data = values = gw_malloc(sizeof(*values));
     /* reset */
     memset(conndata->data, 0, sizeof(*values));
@@ -547,11 +541,16 @@ static int generic_init(SMSCConn *conn, CfgGroup *cfg)
     values->map = generic_get_field_map(cfg);
 
     /* pre-compile regex expressions */
-    if (os != NULL) {   /* this is implicit due to the above if check */
+    if ((os = cfg_get(cfg, octstr_imm("status-success-regex"))) != NULL) {
         if ((values->success_regex = gw_regex_comp(os, REG_EXTENDED|REG_NOSUB)) == NULL)
             error(0, "HTTP[%s]: Could not compile pattern '%s' defined for variable 'status-success-regex'",
                   octstr_get_cstr(conn->id), octstr_get_cstr(os));
         octstr_destroy(os);
+    } else {
+        /* we need at least the criteria for a successful sent */
+        error(0, "HTTP[%s]: 'status-success-regex' required for generic http smsc",
+              octstr_get_cstr(conn->id));
+        return -1;
     }
     if ((os = cfg_get(cfg, octstr_imm("status-permfail-regex"))) != NULL) {
         if ((values->permfail_regex = gw_regex_comp(os, REG_EXTENDED|REG_NOSUB)) == NULL)
