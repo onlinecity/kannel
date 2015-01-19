@@ -83,6 +83,11 @@
 
 #define SMPP_DEFAULT_CHARSET "UTF-8"
 
+enum smpp_pdu_dump_format {
+    SMPP_PDU_DUMP_MULTILINE = 1,
+    SMPP_PDU_DUMP_LINE      = 2
+};
+
 /*
  * Select these based on whether you want to dump SMPP PDUs as they are
  * sent and received or not. Not dumping should be the default in at least
@@ -92,14 +97,17 @@
 #define DEBUG 1
 
 #ifndef DEBUG
-#define dump_pdu(msg, id, pdu) do{}while(0)
+#define dump_pdu(msg, id, pdu, format) do{}while(0)
 #else
 /** This version does dump. */
-#define dump_pdu(msg, id, pdu)                  \
+#define dump_pdu(msg, id, pdu, format)          \
     do {                                        \
         debug("bb.sms.smpp", 0, "SMPP[%s]: %s", \
             octstr_get_cstr(id), msg);          \
-        smpp_pdu_dump(id, pdu);                 \
+        if (format == SMPP_PDU_DUMP_MULTILINE)  \
+            smpp_pdu_dump(id, pdu);             \
+        else                                    \
+            smpp_pdu_dump_line(id, pdu);        \
     } while(0)
 #endif
 
@@ -173,6 +181,7 @@ typedef struct {
     long wait_ack;
     int wait_ack_action;
     int esm_class;
+    long log_format;
     Load *load;
     SMSCConn *conn;
 } SMPP;
@@ -1138,7 +1147,7 @@ static int send_enquire_link(SMPP *smpp, Connection *conn, long *last_sent)
     *last_sent = date_universal_now();
 
     pdu = smpp_pdu_create(enquire_link, counter_increase(smpp->message_id_counter));
-    dump_pdu("Sending enquire link:", smpp->conn->id, pdu);
+    dump_pdu("Sending enquire link:", smpp->conn->id, pdu, smpp->log_format);
     os = smpp_pdu_pack(smpp->conn->id, pdu);
     if (os != NULL)
         ret = conn_write(conn, os); /* Write errors checked by caller. */
@@ -1158,7 +1167,7 @@ static int send_gnack(SMPP *smpp, Connection *conn, long reason, unsigned long s
 
     pdu = smpp_pdu_create(generic_nack, seq_num);
     pdu->u.generic_nack.command_status = reason;
-    dump_pdu("Sending generic_nack:", smpp->conn->id, pdu);
+    dump_pdu("Sending generic_nack:", smpp->conn->id, pdu, smpp->log_format);
     os = smpp_pdu_pack(smpp->conn->id, pdu);
     if (os != NULL)
         ret = conn_write(conn, os);
@@ -1177,7 +1186,7 @@ static int send_unbind(SMPP *smpp, Connection *conn)
     int ret;
 
     pdu = smpp_pdu_create(unbind, counter_increase(smpp->message_id_counter));
-    dump_pdu("Sending unbind:", smpp->conn->id, pdu);
+    dump_pdu("Sending unbind:", smpp->conn->id, pdu, smpp->log_format);
     os = smpp_pdu_pack(smpp->conn->id, pdu);
     if (os != NULL)
         ret = conn_write(conn, os);
@@ -1190,13 +1199,13 @@ static int send_unbind(SMPP *smpp, Connection *conn)
 }
 
 
-static int send_pdu(Connection *conn, Octstr *id, SMPP_PDU *pdu)
+static int send_pdu(Connection *conn, SMPP *smpp, SMPP_PDU *pdu)
 {
     Octstr *os;
     int ret;
 
-    dump_pdu("Sending PDU:", id, pdu);
-    os = smpp_pdu_pack(id, pdu);
+    dump_pdu("Sending PDU:", smpp->conn->id, pdu, smpp->log_format);
+    os = smpp_pdu_pack(smpp->conn->id, pdu);
     if (os) {
         /* Caller checks for write errors later */
         ret = conn_write(conn, os);
@@ -1240,7 +1249,7 @@ static int send_messages(SMPP *smpp, Connection *conn, long *pending_submits)
             continue;
         }
         /* check for write errors */
-        if (send_pdu(conn, smpp->conn->id, pdu) == 0) {
+        if (send_pdu(conn, smpp, pdu) == 0) {
             struct smpp_msg *smpp_msg = smpp_msg_create(msg);
             os = octstr_format("%ld", pdu->u.submit_sm.sequence_number);
             dict_put(smpp->sent_msgs, os, smpp_msg);
@@ -1301,7 +1310,7 @@ static Connection *open_transmitter(SMPP *smpp)
         octstr_duplicate(smpp->address_range);
     bind->u.bind_transmitter.addr_ton = smpp->bind_addr_ton;
     bind->u.bind_transmitter.addr_npi = smpp->bind_addr_npi;
-    if (send_pdu(conn, smpp->conn->id, bind) == -1) {
+    if (send_pdu(conn, smpp, bind) == -1) {
         error(0, "SMPP[%s]: Couldn't send bind_transmitter to server.",
               octstr_get_cstr(smpp->conn->id));
         conn_destroy(conn);
@@ -1352,7 +1361,7 @@ static Connection *open_transceiver(SMPP *smpp)
     bind->u.bind_transceiver.address_range = octstr_duplicate(smpp->address_range);
     bind->u.bind_transceiver.addr_ton = smpp->bind_addr_ton;
     bind->u.bind_transceiver.addr_npi = smpp->bind_addr_npi;
-    if (send_pdu(conn, smpp->conn->id, bind) == -1) {
+    if (send_pdu(conn, smpp, bind) == -1) {
         error(0, "SMPP[%s]: Couldn't send bind_transceiver to server.",
               octstr_get_cstr(smpp->conn->id));
         conn_destroy(conn);
@@ -1405,7 +1414,7 @@ static Connection *open_receiver(SMPP *smpp)
         octstr_duplicate(smpp->address_range);
     bind->u.bind_receiver.addr_ton = smpp->bind_addr_ton;
     bind->u.bind_receiver.addr_npi = smpp->bind_addr_npi;
-    if (send_pdu(conn, smpp->conn->id, bind) == -1) {
+    if (send_pdu(conn, smpp, bind) == -1) {
         error(0, "SMPP[%s]: Couldn't send bind_receiver to server.",
               octstr_get_cstr(smpp->conn->id));
         conn_destroy(conn);
@@ -2150,7 +2159,7 @@ static int handle_pdu(SMPP *smpp, Connection *conn, SMPP_PDU *pdu,
     }
 
     if (resp != NULL) {
-        ret = send_pdu(conn, smpp->conn->id, resp) != -1 ? 0 : -1;
+        ret = send_pdu(conn, smpp, resp) != -1 ? 0 : -1;
         smpp_pdu_destroy(resp);
     }
 
@@ -2295,7 +2304,7 @@ static void io_thread(void *arg)
                 }
             } else if (ret == 1) { /* data available */
                 /* Deal with the PDU we just got */
-                dump_pdu("Got PDU:", smpp->conn->id, pdu);
+                dump_pdu("Got PDU:", smpp->conn->id, pdu, smpp->log_format);
                 ret = handle_pdu(smpp, conn, pdu, &pending_submits);
                 smpp_pdu_destroy(pdu);
                 if (ret == -1) {
@@ -2385,7 +2394,7 @@ static void io_thread(void *arg)
                 while(conn_wait(conn, 1.00) != -1 && IS_ACTIVE &&
                       difftime(time(NULL), last_response) < SMPP_DEFAULT_SHUTDOWN_TIMEOUT) {
                     if (read_pdu(smpp, conn, &len, &pdu) == 1) {
-                        dump_pdu("Got PDU:", smpp->conn->id, pdu);
+                        dump_pdu("Got PDU:", smpp->conn->id, pdu, smpp->log_format);
                         handle_pdu(smpp, conn, pdu, &pending_submits);
                         smpp_pdu_destroy(pdu);
                     }
@@ -2754,6 +2763,9 @@ int smsc_smpp_create(SMSCConn *conn, CfgGroup *grp)
     if (smsc_id == NULL) {
         conn->id = octstr_duplicate(conn->name);
     }
+
+    if (cfg_get_integer(&smpp->log_format, grp, octstr_imm("log-format")) == -1)
+        smpp->log_format = SMPP_PDU_DUMP_MULTILINE;
 
     octstr_destroy(host);
     octstr_destroy(username);

@@ -323,6 +323,7 @@ MULTI_GROUP(smsc,
     OCTSTR(reroute-dlr)
     OCTSTR(log-file)
     OCTSTR(log-level)
+    OCTSTR(log-format)
     OCTSTR(our-host)
     OCTSTR(alt-dcs)
     OCTSTR(throughput)

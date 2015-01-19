@@ -750,6 +750,59 @@ void smpp_pdu_dump(Octstr *smsc_id, SMPP_PDU *pdu)
 }
 
 
+void smpp_pdu_dump_line(Octstr *smsc_id, SMPP_PDU *pdu)
+{
+    Octstr *str = octstr_create("");
+
+    octstr_format_append(str, "SMPP PDU %p dump: [type_name:%d:%s]", (void *) pdu, strlen(pdu->type_name), pdu->type_name);
+    switch (pdu->type) {
+    #define OPTIONAL_BEGIN
+    #define TLV_INTEGER(name, max_len) \
+        if (p->name != -1)  { \
+            INTEGER(name, max_len) \
+        }
+    #define TLV_NULTERMINATED(name, max_len) \
+        if (p->name != NULL) { \
+            NULTERMINATED(name, max_len) \
+        }
+    #define TLV_OCTETS(name, min_len, max_len) \
+        if (p->name != NULL) { \
+            OCTETS(name, max_len) \
+        }
+    #define OPTIONAL_END \
+        if (p->tlv != NULL) { \
+            List *keys; \
+            Octstr *key; \
+            struct smpp_tlv *tlv; \
+            keys = dict_keys(p->tlv); \
+            while(keys != NULL && (key = gwlist_extract_first(keys)) != NULL) { \
+                tlv = smpp_tlv_get_by_name(smsc_id, key); \
+                if (tlv != NULL) { \
+                    Octstr *val = dict_get(p->tlv, key); \
+                    octstr_format_append(str, " [%E:%d:%E]", key, octstr_len(val), val); \
+                } \
+                octstr_destroy(key); \
+            } \
+            gwlist_destroy(keys, octstr_destroy_item); \
+        }
+    #define INTEGER(name, octets) \
+        octstr_format_append(str, " [%s:0:0x%08lx]", #name, p->name);
+    #define NULTERMINATED(name, max_octets) \
+        octstr_format_append(str, " [%s:%d:%E]", #name, octstr_len(p->name), (p->name != NULL ? p->name : octstr_imm("NULL")));
+    #define OCTETS(name, field_giving_octets) \
+        octstr_format_append(str, " [%s:%d:%E]", #name, octstr_len(p->name), (p->name != NULL ? p->name : octstr_imm("NULL")));
+    #define PDU(name, id, fields) \
+        case id: { struct name *p = &pdu->u.name; fields } break;
+    #include "smpp_pdu.def"
+    default:
+        error(0, "Unknown SMPP_PDU type, internal error.");
+        break;
+    }
+    debug("sms.smpp", 0, "%s", octstr_get_cstr(str));
+    octstr_destroy(str);
+}
+
+
 long smpp_pdu_read_len(Connection *conn)
 {
     Octstr *os;
