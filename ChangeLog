@@ -1,3 +1,8 @@
+2015-01-28  Stipe Tolj  <stolj at kannel.org>
+    * gw/smscconn.c: fixing bug #708 in function c:smscconn_usable(). We need
+      to bail out for connectioks with status SMSCCONN_ACTIVE_RECV, since those
+      can't be used for routing. Some source code reformating, NLC.
+      
 2015-01-19 Alexander Malysh <amalysh at kannel.org>
     * gw/smsc/smpp_pdu.[ch], gw/smsc/smsc_smpp.c, gwlib/cfg.def:
       added new PDU dump function that allow to dump in one line instead of multiline,
