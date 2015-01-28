@@ -1,4 +1,12 @@
 2015-01-28  Stipe Tolj  <stolj at kannel.org>
+    * gwlib/log.[ch]: fix segfault when calling log_thread_to() with -1 argument, due
+      to a failed log_open() call, i.e. permission denied. Since the unsigned int type
+      wrapps arround the if statement in the function yields and we address a random 
+      memory segment via the logfiles[] array, resulting in possible segfaults.
+      Now we also log a WARNING statement in case the thread specific log file could
+      not be opened to inform the user in the general/stdout log abou the fact.
+      
+2015-01-28  Stipe Tolj  <stolj at kannel.org>
     * gw/smscconn.c: fixing bug #708 in function c:smscconn_usable(). We need
       to bail out for connectioks with status SMSCCONN_ACTIVE_RECV, since those
       can't be used for routing. Some source code reformating, NLC.

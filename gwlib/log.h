@@ -174,6 +174,6 @@ void log_close_all(void);
  * Register a thread to a specific logfiles[] index and hence 
  * to a specific exclusive log file.
  */
-void log_thread_to(unsigned int idx);
+void log_thread_to(int idx);
 
 #endif
