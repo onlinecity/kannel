@@ -3726,6 +3726,14 @@ address-range = ""
        Defaults to 3.
      </entry></row>
 
+   <row><entry><literal>log-format</literal></entry>
+     <entry><literal>number</literal></entry>
+     <entry valign="bottom">
+       Selects which SMPP PDU dump format to use:
+       	1 - for multiline (default)
+       	2 - for one line
+     </entry></row>
+
    </tbody></tgroup></informaltable>
 
 </sect2>

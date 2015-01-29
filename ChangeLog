@@ -1,3 +1,7 @@
+2015-01-29 Alexander Malysh <amalysh at kannel.org>
+	* doc/userguide/userguide.xml: added description for new log-format
+      config option.
+
 2015-01-29  Stipe Tolj  <stolj at kannel.org>
     * gw/ota_compiler.c, gw/smsbox.c, gw/wap_push_[pap|si|sl]_compiler.c,
       gw/wml_compiler.c, gwlib/xmlrpc.c: FreeBSD CURRENT messes up with 
