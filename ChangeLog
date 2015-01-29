@@ -1,3 +1,8 @@
+2015-01-29  Stipe Tolj  <stolj at kannel.org>
+    * configure[.in]: fix openssl library detection via GCC's print-file-name
+      argument. We need to obey what $CC is set, not call the binary name 
+      directly. This broke the configure on FreeBSD CURRENT.
+      
 2015-01-28  Stipe Tolj  <stolj at kannel.org>
     * gwlib/log.[ch]: fix segfault when calling log_thread_to() with -1 argument, due
       to a failed log_open() call, i.e. permission denied. Since the unsigned int type

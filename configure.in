@@ -863,9 +863,9 @@ if test "$ssl" = "yes" ; then
         ssllib="$loc"
       fi
     done
-    if test "x$sslib" = "x"; then
+    if test "x$sslib" = "x" && test -n "$GCC"; then
       for lib in libssl.a libssl.so libssl.dylib; do
-        name=`gcc -print-file-name=$lib`
+        name=`$CC -print-file-name=$lib`
         if test -f "$name"; then
           ssllib=`dirname $name`
         fi
