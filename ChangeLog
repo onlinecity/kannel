@@ -1,4 +1,10 @@
 2015-01-29  Stipe Tolj  <stolj at kannel.org>
+    * gw/ota_compiler.c, gw/smsbox.c, gw/wap_push_[pap|si|sl]_compiler.c,
+      gw/wml_compiler.c, gwlib/xmlrpc.c: FreeBSD CURRENT messes up with 
+      __wchar_t typedef used heavily by libxml2, so we need to make sure the
+      internal types are included to fix the building on FreeBSD CURRENT.
+      
+2015-01-29  Stipe Tolj  <stolj at kannel.org>
     * configure[.in]: fix openssl library detection via GCC's print-file-name
       argument. We need to obey what $CC is set, not call the binary name 
       directly. This broke the configure on FreeBSD CURRENT.

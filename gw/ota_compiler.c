@@ -80,6 +80,7 @@
  */
 
 #include <ctype.h>
+#include <inttypes.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/tree.h>
 #include <libxml/debugXML.h>

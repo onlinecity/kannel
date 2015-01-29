@@ -82,13 +82,14 @@
  * By  Aarno Syvänen for Wapit Ltd and for Wiral Ltd.
  */
 
+#include <ctype.h>
+#include <string.h>
+#include <inttypes.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/debugXML.h>
 #include <libxml/encoding.h>
-#include <ctype.h>
-#include <string.h>
 
 #include "shared.h"
 #include "wap_push_pap_compiler.h"

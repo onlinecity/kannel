@@ -62,6 +62,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include <inttypes.h>
 
 /* libxml & xpath things */
 #include <libxml/tree.h>
