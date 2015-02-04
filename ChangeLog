@@ -1,3 +1,7 @@
+2015-02-04  Stipe Tolj  <stolj at kannel.org>
+    * gwlib/log.c: don't dump the WARNING in log_thread_to() if there was no
+      attempt to open an SMSC specific log, i.e. no 'log-file' was set.
+      
 2015-01-29 Alexander Malysh <amalysh at kannel.org>
 	* doc/userguide/userguide.xml: added description for new log-format
       config option.
