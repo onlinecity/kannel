@@ -749,7 +749,7 @@ static void get_x_kannel_from_xml(int requesttype , Octstr **type, Octstr **body
 
     /* smsc */
     XPATH_SEARCH_OCTSTR("/message/submit/smsc", *smsc, 0);
-    if (smsc == NULL)
+    if (*smsc == NULL)
         XPATH_SEARCH_OCTSTR("/message/submit/to", *smsc, 0);
 
     /* pid */
