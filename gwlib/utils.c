@@ -370,7 +370,6 @@ static void parachute_start(const char *myname, const char *panic_script) {
                 info(0, "Child process crashed while shutdown. Exiting due to signal...");
                 info(0, "Going into gwlib_shutdown...");
                 gwlib_shutdown();
-                info(0, "gwlib_shutdown done... Bye bye...");
                 exit(WIFEXITED(status) ? WEXITSTATUS(status) : 0);
             }
 
@@ -379,7 +378,6 @@ static void parachute_start(const char *myname, const char *panic_script) {
                 info(0, "Child process crashed while starting. Exiting...");
                 info(0, "Going into gwlib_shutdown...");
                 gwlib_shutdown();
-                info(0, "gwlib_shutdown done... Bye bye...");
                 exit(WIFEXITED(status) ? WEXITSTATUS(status) : 1);
             }
 
