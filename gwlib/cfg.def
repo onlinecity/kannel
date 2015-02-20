@@ -650,6 +650,13 @@ SINGLE_GROUP(dlr-db,
     OCTSTR(field-boxc-id)
 )
 
+SINGLE_GROUP(store-db,
+    OCTSTR(id)
+    OCTSTR(table)
+    OCTSTR(field-uuid)
+    OCTSTR(field-message)
+)
+
 
 SINGLE_GROUP(radius-acct,
     OCTSTR(our-host)

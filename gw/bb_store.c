@@ -78,7 +78,7 @@ Octstr* (*store_msg_pack)(Msg *msg);
 Msg* (*store_msg_unpack)(Octstr *os);
  
 
-int store_init(const Octstr *type, const Octstr *fname, long dump_freq,
+int store_init(Cfg *cfg, const Octstr *type, const Octstr *fname, long dump_freq,
                void *pack_func, void *unpack_func)
 {
     int ret;
@@ -90,6 +90,10 @@ int store_init(const Octstr *type, const Octstr *fname, long dump_freq,
         ret = store_file_init(fname, dump_freq);
     } else if (octstr_str_compare(type, "spool") == 0) {
         ret = store_spool_init(fname);
+#ifdef HAVE_REDIS
+    } else if (octstr_str_compare(type, "redis") == 0) {
+        ret = store_redis_init(cfg);
+#endif
     } else {
         error(0, "Unknown 'store-type' defined.");
         ret = -1;

@@ -1494,20 +1494,27 @@ admin-password = f00bar
      <entry>filename</entry>
      <entry valign="bottom">
         Kannel can use store subsystem that means storing messages
-        on hard disk until they are successfully handled. By using
-        this subsystem, no SMS messages are lost in Kannel even by
+        on hard disk or in a remote key store until they are successfully 
+        handled. By using this subsystem, no SMS messages are lost in Kannel even by
         crash, but theoretically some messages can duplicate when
         system is taken down violently. 
         This variable defines a type of backend used for store
         subsystem. Now two types are supported:
         a) file: writes store into one single file
         b) spool: writes store into spool directory (one file for each message)
+        c) redis: writes store into a redis key storage. For redis as message storage
+           you will need a <literal>group = redis-connection</literal> and a
+           <literal>group = store-db</literal> configuration group that define the
+           connection to the redis server and the table name to be used. See file
+           <literal>doc/examples/store-redis.conf</literal> for an example config
+           secttion.
      </entry></row>
 
     <row><entry><literal>store-location</literal></entry>
      <entry>filename</entry>
      <entry valign="bottom">
-        Depends on <literal>store-type</literal> option used, it is ether file or spool directory.
+        Depends on <literal>store-type</literal> option used, it is ether file or spool directory,
+        or none if redis is used as storage subsystem.
      </entry></row>
 
     <row><entry><literal>store-dump-freq</literal></entry>

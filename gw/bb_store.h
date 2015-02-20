@@ -98,7 +98,7 @@ extern Octstr* (*store_msg_pack)(Msg *msg);
 extern Msg* (*store_msg_unpack)(Octstr *os);
 
 /* initialize system. Return -1 if fname is bad (too long). */
-int store_init(const Octstr *type, const Octstr *fname, long dump_freq,
+int store_init(Cfg *cfg, const Octstr *type, const Octstr *fname, long dump_freq,
                void *pack_func, void *unpack_func);
 
 /* init shutdown (system dies when all acks have been processed) */
@@ -112,7 +112,9 @@ extern Octstr* (*store_status)(int status_type);
  */
 int store_spool_init(const Octstr *fname);
 int store_file_init(const Octstr *fname, long dump_freq);
-
+#ifdef HAVE_REDIS
+int store_redis_init(Cfg *cfg);
+#endif
 
 #endif /*BB_STORE_H_*/
 

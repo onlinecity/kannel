@@ -1,4 +1,19 @@
 2015-02-20  Stipe Tolj  <stolj at kannel.org>
+    * doc/examples/store-redis.conf: configuration example for redis msg store.
+    * doc/userguide/userguide.xml: document 'store-type = redis' option.
+    * gw/bb_store_redis.c: backend implementation of the message store in a
+      redis key store.
+    * gw/bb_store.[ch]: adding Cfg* passing in store_init() prototype.
+    * gw/bearerbox.c: changed to do store_init() prototype change.
+    * gwlib/cfg.def: adding 'group = store-db' as group for message backends
+      as databases or key stores.
+    * test/test_store_dump.c: changed to do store_init() prototype change.
+    This patchset implements the redis key store backend as a message store for
+    bearerbox. This allows to have persistancy on a remote system without using
+    the local file system. Thanks to Alejandro Guerrieri for the patch.
+    [Msg-Id: <CAG8-fBm0OvF777g9wGf58kq3SCj84aEz2zabomL924VoE3dO_w@mail.gmail.com>]
+    
+2015-02-20  Stipe Tolj  <stolj at kannel.org>
     * gwlib/utils.c: removing info() calls after gwlib_shutdown() calls for the
       parent process exiting. This results in a 0 exit code on MacOS.
       
