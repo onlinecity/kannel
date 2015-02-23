@@ -1,3 +1,7 @@
+2015-02-23  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsc/smsc_http.c: the queued callback function should return the number
+      of messages in queue, and not the open requests that we are pending.
+
 2015-02-20  Stipe Tolj  <stolj at kannel.org>
     * doc/examples/store-redis.conf: configuration example for redis msg store.
     * doc/userguide/userguide.xml: document 'store-type = redis' option.
