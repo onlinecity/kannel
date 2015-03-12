@@ -337,19 +337,19 @@ depend .depend: wmlscript/wsgram.h gw-config.h $(soap_depend)
 include .depend
 
 libgw.a: $(gwobjs)
-	@LIBTOOL@ libgw.a $(gwobjs)
+	@OLD_LIBTOOL@ libgw.a $(gwobjs)
 	$(RANLIB) libgw.a
 
 libgwlib.a: $(libobjs)
-	@LIBTOOL@  libgwlib.a $(libobjs)
+	@OLD_LIBTOOL@  libgwlib.a $(libobjs)
 	$(RANLIB) libgwlib.a
 
 libwmlscript.a: $(wmlscriptobjs)
-	@LIBTOOL@ libwmlscript.a $(wmlscriptobjs)
+	@OLD_LIBTOOL@ libwmlscript.a $(wmlscriptobjs)
 	$(RANLIB) libwmlscript.a
 
 libwap.a: $(wapobjs)
-	@LIBTOOL@ libwap.a $(wapobjs)
+	@OLD_LIBTOOL@ libwap.a $(wapobjs)
 	$(RANLIB) libwap.a
 
 wmlscript/wsgram.h: wmlscript/wsgram.c

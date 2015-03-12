@@ -1,3 +1,7 @@
+2015-03-12 Alexander Malysh <amalysh at kannel.org>
+    * Makefile.in, aclocal.m4, bootstrap.sh, configure, configure.in, soap/Makefile.in:
+      first step in automake direction.
+
 2015-02-23  Stipe Tolj  <stolj at kannel.org>
     * gw/smsc/smsc_http.c: the queued callback function should return the number
       of messages in queue, and not the open requests that we are pending.

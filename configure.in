@@ -86,6 +86,12 @@ AC_SUBST(GW_VERSION)
 AC_SUBST(VERSION)
 AC_CONFIG_SECTION([Configuring for Kannel gateway version $VERSION])
 
+AM_INIT_AUTOMAKE(Kannel,$VERSION)
+AC_LANG_C
+AC_DISABLE_STATIC
+AC_PROG_LIBTOOL
+dnl AC_SUBST(LIBTOOL_DEPS)
+
 dnl Solaris pkgadd support definitions
 PKGADD_PKG="KANNELgateway"
 PKGADD_NAME="Kannel - WAP and SMS gateway"
@@ -121,7 +127,7 @@ dnl Apply system specific rules.
 dnl Executable extension for systems that need one, i.e. Cygwin
 dnl Set the LIBTOOL to be used to create libs
 EXE_EXT=""
-LIBTOOL="$AR rc"
+OLD_LIBTOOL="$AR rc"
 case "$host" in
   *-sun-solaris*) 
     CFLAGS="$CFLAGS -DSunOS=1"
@@ -153,7 +159,7 @@ case "$host" in
     else
       CFLAGS="$CFLAGS -DDARWIN=1" 
     fi
-    LIBTOOL="libtool -static -o" 
+    OLD_LIBTOOL="libtool -static -o" 
     ;;
   *-linux-*)
     CFLAGS="$CFLAGS -D_XOPEN_SOURCE=600 -D_BSD_SOURCE"
@@ -170,7 +176,7 @@ case "$host" in
     ;;
 esac
 AC_SUBST(EXE_EXT)
-AC_SUBST(LIBTOOL)
+AC_SUBST(OLD_LIBTOOL)
 
 AC_ARG_WITH(cflags,
 [  --with-cflags=FLAGS     use FLAGS for CFLAGS],
@@ -1449,7 +1455,11 @@ AC_ARG_WITH(gsoap,
 dnl Final Output
 
 AC_CONFIG_SECTION([Generating output files]) 
-AC_OUTPUT(gwlib/gw_uuid_types.h Makefile soap/Makefile)
+AC_OUTPUT([
+	gwlib/gw_uuid_types.h
+	Makefile
+	soap/Makefile
+])
 
 
 dnl LICENSE notice
