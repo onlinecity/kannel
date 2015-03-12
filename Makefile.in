@@ -385,6 +385,6 @@ gw-config: utils/foobar-config.sh Makefile
 	chmod 0755 gw-config
 
 $(SUBDIRS):
-	$(MAKE) -C $@
+	$(MAKE) -C $@ $(MAKECMDGOALS)
 
 .PHONY: $(SUBDIRS)

@@ -1,4 +1,7 @@
 2015-03-12 Alexander Malysh <amalysh at kannel.org>
+    * Makefile.in: fixed make invocation for subfolders
+
+2015-03-12 Alexander Malysh <amalysh at kannel.org>
     * Makefile.in: addeed possibility to easy add subdirectories to build process
 
 2015-03-12 Alexander Malysh <amalysh at kannel.org>
