@@ -1,3 +1,7 @@
+2015-03-19  Stipe Tolj  <stolj at kannel.org>
+    * gw/bb_store_redis.c: fix memory leak when the result set is empty, we still
+      get a single row entry from the redis side, which needs to be destroyed.
+      
 2015-03-18  Stipe Tolj  <stolj at kannel.org>
     * config.guess: update to latest version to support various more platforms.
       [http://savannah.gnu.org/projects/config]

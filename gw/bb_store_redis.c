@@ -234,8 +234,8 @@ static int store_redis_getall(int ignore_err, void(*cb)(Octstr*, void*), void *d
                 octstr_destroy(os);
                 octstr_destroy(key);
             }
+            gwlist_destroy(row, octstr_destroy_item);
         }
-        gwlist_destroy(row, octstr_destroy_item);
     } else {
         debug("store.redis", 0, "No messages loaded from redis store");
     }
