@@ -1681,7 +1681,7 @@ static void sms_to_smsboxes(void *arg)
 
     newmsg = startmsg = msg = NULL;
 
-    while(bb_status != BB_DEAD) {
+    while (bb_status != BB_SHUTDOWN && bb_status != BB_DEAD) {
 
         if (newmsg == startmsg) {
             /* check if we are in shutdown phase */

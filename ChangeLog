@@ -1,3 +1,11 @@
+2015-05-17  Stipe Tolj  <stolj at kannel.org>
+    * gw/bb_boxc.c: ensure we get a wakeup call while being in gwthread_sleep()
+      in sms_to_smsboxes(), which reduces the shutdown waiting time. Ensure
+      we don't re-loop if we're in shutdown phase.
+    * gw/bearerbox.c: issue gwthread_wakeup_all() after bb_shutdown() in order
+      to wakeup all pending sleepers.
+    [Msg-Id: <55364459.7030503@kannel.org>]
+      
 2015-03-19  Stipe Tolj  <stolj at kannel.org>
     * gw/bb_store_redis.c: fix memory leak when the result set is empty, we still
       get a single row entry from the redis side, which needs to be destroyed.

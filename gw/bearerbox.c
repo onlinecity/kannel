@@ -789,6 +789,9 @@ int main(int argc, char **argv)
     /* call shutdown */
     bb_shutdown();
 
+    /* wake up any sleeping threads */
+    gwthread_wakeup_all();
+
     /* wait until flow threads exit */
     while (gwlist_consume(flow_threads) != NULL)
         ;
