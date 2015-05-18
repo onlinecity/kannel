@@ -1742,9 +1742,13 @@ static int handle_pdu(SMPP *smpp, Connection *conn, SMPP_PDU *pdu,
                      reason = bb_smscconn_receive(smpp->conn, dlrmsg);
                  } else {
                      /* no DLR will be passed, but we write an access-log entry */
-                     reason = SMSCCONN_SUCCESS;
                      msg = data_sm_to_msg(smpp, pdu, &reason);
-                     bb_alog_sms(smpp->conn, msg, "FAILED DLR SMS");
+                     if (msg == NULL || reason != SMPP_ESME_ROK) {
+                         resp->u.data_sm_resp.command_status = reason;
+                         break;
+                     }
+                     reason = SMSCCONN_SUCCESS;
+                     bb_alog_sms(smpp->conn, msg, "FAILED Receive DLR");
                      msg_destroy(msg);
                  }
                  resp->u.data_sm_resp.command_status = smscconn_failure_reason_to_smpp_status(reason);
@@ -1808,9 +1812,19 @@ static int handle_pdu(SMPP *smpp, Connection *conn, SMPP_PDU *pdu,
                     if (dlrmsg->sms.meta_data == NULL)
                         dlrmsg->sms.meta_data = octstr_create("");
                     meta_data_set_values(dlrmsg->sms.meta_data, pdu->u.deliver_sm.tlv, "smpp", 0);
+                    /* passing DLR to upper layer */
                     reason = bb_smscconn_receive(smpp->conn, dlrmsg);
-                } else
+                } else {
+                    /* no DLR will be passed, but we write an access-log entry */
+                    msg = pdu_to_msg(smpp, pdu, &reason);
+                    if (msg == NULL) {
+                        resp->u.deliver_sm_resp.command_status = reason;
+                        break;
+                    }
                     reason = SMSCCONN_SUCCESS;
+                    bb_alog_sms(smpp->conn, msg, "FAILED Receive DLR");
+                    msg_destroy(msg);
+                }
                 resp->u.deliver_sm_resp.command_status = smscconn_failure_reason_to_smpp_status(reason);
             } else {/* MO-SMS */
                 resp = smpp_pdu_create(deliver_sm_resp,

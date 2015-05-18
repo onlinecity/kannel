@@ -1,3 +1,8 @@
+2015-05-18  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsc/smsc_smpp.c: harmonize the [data|deliver]_sm handling where we
+      don't find a DLR in our storage. Make sure we log a FAILED event in the
+      access-log for both PDU types.
+      
 2015-05-17  Stipe Tolj  <stolj at kannel.org>
     * gw/bb_boxc.c: ensure we get a wakeup call while being in gwthread_sleep()
       in sms_to_smsboxes(), which reduces the shutdown waiting time. Ensure
