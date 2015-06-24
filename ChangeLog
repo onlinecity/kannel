@@ -1,3 +1,7 @@
+2015-06-24 Alexander Malysh <amalysh at kannel.org>
+    * utils/mtbatch.1: fixed bad formatting. This fixes #728.
+      Thanks to Kalle Niemitalo. 
+
 2015-05-18  Stipe Tolj  <stolj at kannel.org>
     * gw/smsc/smsc_smpp.c: harmonize the [data|deliver]_sm handling where we
       don't find a DLR in our storage. Make sure we log a FAILED event in the
