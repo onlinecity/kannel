@@ -159,7 +159,10 @@ case "$host" in
     else
       CFLAGS="$CFLAGS -DDARWIN=1" 
     fi
-    OLD_LIBTOOL="libtool -static -o" 
+    OLD_LIBTOOL="libtool -static -o"
+    # because if libiconv issue on OSX with MacPorts installed
+    # try to set system library path at the beginning
+    LIBS="$LIBS -L/usr/lib"
     ;;
   *-linux-*)
     CFLAGS="$CFLAGS -D_XOPEN_SOURCE=600 -D_BSD_SOURCE"

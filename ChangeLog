@@ -1,4 +1,8 @@
 2015-06-24 Alexander Malysh <amalysh at kannel.org>
+    * configure.in, configure: fixed library search path order issue on OSX with
+      MacPorts installed where iconv library was not found for linking.
+
+2015-06-24 Alexander Malysh <amalysh at kannel.org>
     * utils/mtbatch.1: fixed bad formatting. This fixes #728.
       Thanks to Kalle Niemitalo. 
 
