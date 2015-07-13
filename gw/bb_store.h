@@ -105,7 +105,10 @@ int store_init(Cfg *cfg, const Octstr *type, const Octstr *fname, long dump_freq
 extern void (*store_shutdown)(void);
 
 /* return all containing messages in the current store */
-extern Octstr* (*store_status)(int status_type);
+Octstr* store_status(int status_type);
+
+extern void (*store_for_each_message)(void(*callback_fn)(Msg*, void*), void *data);
+
 
 /**
  * Init functions for different store types.

@@ -1,3 +1,9 @@
+2015-07-13 Alexander Malysh <amalysh at kannel.org>
+    * gw/bb_store.[ch], gw/bb_store_file.c, gw/bb_store_redis.c, gw/bb_store_spool.c:
+      Applied patch that fixes store file race condition by status request. Additionally
+      this patch removes status from each of store and add it to bb_store to abstract and
+      simplify status handling in store.
+
 2015-07-01  Stipe Tolj  <stolj at kannel.org>
     * doc/userguide/userguide.xml: add documentation for escape code %N for DLR
       notification text.
