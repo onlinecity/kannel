@@ -65,12 +65,15 @@
 #ifndef META_DATA_H
 #define META_DATA_H
 
-#define METADATA_DLR_GROUP            "dlr"
-#define METADATA_DLR_GROUP_DONETIME   "donetime"
-#define METADATA_DLR_GROUP_SUBMITTIME "submittime"
-#define METADATA_DLR_GROUP_ERRORCODE  "errorcode"
+#define METADATA_DLR_GROUP					"dlr"
+#define METADATA_DLR_GROUP_DONETIME   		"donetime"
+#define METADATA_DLR_GROUP_SUBMITTIME 		"submittime"
+#define METADATA_DLR_GROUP_ERRORCODE  		"errorcode"
 
-#define METADATA_SMPP_GROUP           "smpp"
+#define METADATA_ORIG_MSG_GROUP       		"orig_msg"
+#define METADATA_ORIG_MSG_GROUP_DLR_MASK 	"dlr_mask"
+
+#define METADATA_SMPP_GROUP           		"smpp"
 
 /**
  * Get Dictionary with all values for this group.

@@ -1,3 +1,9 @@
+2015-07-20  Stipe Tolj  <stolj at kannel.org>
+    * gw/dlr.c: add the original msg DLR bitmask to the meta-data of the DLR, 
+      allowing smsbox applications to retrieve this information on-the-fly
+      without the need to do local storage/retrieval.
+    * gw/meta_data.h: define the macros for the DLR bitmask of the orig msg.
+    
 2015-07-13 Alexander Malysh <amalysh at kannel.org>
     * gw/bb_store.[ch], gw/bb_store_file.c, gw/bb_store_redis.c, gw/bb_store_spool.c:
       Applied patch that fixes store file race condition by status request. Additionally

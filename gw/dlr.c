@@ -91,6 +91,7 @@
 #include "sms.h"
 #include "dlr.h"
 #include "dlr_p.h"
+#include "meta_data.h"
 
 /* Our callback functions */
 static struct dlr_storage *handles = NULL;
@@ -386,6 +387,7 @@ Msg *dlr_find(const Octstr *smsc, const Octstr *ts, const Octstr *dst, int typ, 
     Msg	*msg = NULL;
     struct dlr_entry *dlr = NULL;
     Octstr *dst_min = NULL;
+    Octstr *dlr_mask;
     
     if(octstr_len(smsc) == 0) {
 	warning(0, "DLR[%s]: Can't find a dlr without smsc-id", dlr_type());
@@ -438,6 +440,17 @@ Msg *dlr_find(const Octstr *smsc, const Octstr *ts, const Octstr *dst, int typ, 
          * route this msg back to originating smsbox
          */
         O_SET(msg->sms.boxc_id, dlr->boxc_id);
+        /*
+         * We will provide the DLR request bitmask in the DLR going back
+         * to the smsbox connection for processing. This allows smsbox
+         * connection type applications to avoid temporary storing and
+         * resolving data to pull up this information.
+         */
+        dlr_mask = octstr_format("%ld", dlr->mask);
+        msg->sms.meta_data = octstr_create("");
+        meta_data_set_value(msg->sms.meta_data, METADATA_ORIG_MSG_GROUP,
+                            octstr_imm(METADATA_ORIG_MSG_GROUP_DLR_MASK), dlr_mask, 1);
+        octstr_destroy(dlr_mask);
 
         time(&msg->sms.time);
         debug("dlr.dlr", 0, "DLR[%s]: created DLR message for URL <%s>",
