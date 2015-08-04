@@ -1356,9 +1356,8 @@ void server_shutdown_ssl(void)
 
 void use_global_client_certkey_file(Octstr *certkeyfile)
 { 
-    SSL_CTX_use_certificate_file(global_ssl_context, 
-                                 octstr_get_cstr(certkeyfile), 
-                                 SSL_FILETYPE_PEM);
+    SSL_CTX_use_certificate_chain_file(global_ssl_context, 
+                                       octstr_get_cstr(certkeyfile));
     SSL_CTX_use_PrivateKey_file(global_ssl_context,
                                 octstr_get_cstr(certkeyfile),
                                 SSL_FILETYPE_PEM);
@@ -1372,9 +1371,8 @@ void use_global_client_certkey_file(Octstr *certkeyfile)
 
 void use_global_server_certkey_file(Octstr *certfile, Octstr *keyfile) 
 {
-    SSL_CTX_use_certificate_file(global_server_ssl_context, 
-                                  octstr_get_cstr(certfile), 
-                                  SSL_FILETYPE_PEM);
+    SSL_CTX_use_certificate_chain_file(global_server_ssl_context, 
+                                       octstr_get_cstr(certfile));
     SSL_CTX_use_PrivateKey_file(global_server_ssl_context,
                                  octstr_get_cstr(keyfile),
                                  SSL_FILETYPE_PEM);
