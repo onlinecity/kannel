@@ -415,3 +415,44 @@ int sms_priority_compare(const void *a, const void *b)
     return ret;
 }
 
+
+int sms_charset_processing(Octstr *charset, Octstr *body, int coding)
+{
+    int resultcode = 0;
+
+    /*
+    debug("gw.sms", 0, "%s: enter, charset=%s, coding=%d, msgdata is:",
+          __func__, octstr_get_cstr(charset), coding);
+    octstr_dump(body, 0);
+    */
+
+    if (octstr_len(charset)) {
+        if (coding == DC_7BIT) {
+            /*
+             * For 7 bit, convert to UTF-8
+             */
+            if (charset_convert(body, octstr_get_cstr(charset), "UTF-8") < 0) {
+                error(0, "Failed to convert msgdata from charset <%s> to <%s>, will leave as is.",
+                      octstr_get_cstr(charset), "UTF-8");
+                resultcode = -1;
+            }
+        } else if (coding == DC_UCS2) {
+            /*
+             * For UCS-2, convert to UTF-16BE
+             */
+            if (charset_convert(body, octstr_get_cstr(charset), "UTF-16BE") < 0) {
+                error(0, "Failed to convert msgdata from charset <%s> to <%s>, will leave as is.",
+                      octstr_get_cstr(charset), "UTF-16BE");
+                resultcode = -1;
+            }
+        }
+    }
+
+    /*
+    debug("gw.sms", 0, "%s: exit, charset=%s, coding=%d, msgdata is:",
+          __func__, octstr_get_cstr(charset), coding);
+    octstr_dump(body, 0);
+    */
+
+    return resultcode;
+}

@@ -632,7 +632,7 @@ static void kannel_receive_sms(SMSCConn *conn, HTTPClient *client,
                                List *headers, Octstr *body, List *cgivars)
 {
     ConnData *conndata = conn->data;
-    Octstr *user, *pass, *from, *to, *text, *udh, *account, *binfo;
+    Octstr *user, *pass, *from, *to, *text, *udh, *account, *binfo, *charset;
     Octstr *dlrmid, *dlrerr;
     Octstr *tmp_string, *retmsg;
     int	mclass, mwi, coding, validity, deferred, dlrmask;
@@ -648,6 +648,7 @@ static void kannel_receive_sms(SMSCConn *conn, HTTPClient *client,
     to = http_cgi_variable(cgivars, "to");
     text = http_cgi_variable(cgivars, "text");
     udh = http_cgi_variable(cgivars, "udh");
+    charset = http_cgi_variable(cgivars, "charset");
     account = http_cgi_variable(cgivars, "account");
     binfo = http_cgi_variable(cgivars, "binfo");
     dlrmid = http_cgi_variable(cgivars, "dlr-mid");
@@ -769,11 +770,21 @@ static void kannel_receive_sms(SMSCConn *conn, HTTPClient *client,
         msg->sms.deferred = (deferred == SMS_PARAM_UNDEFINED ? deferred : time(NULL) + deferred * 60);
         msg->sms.account = octstr_duplicate(account);
         msg->sms.binfo = octstr_duplicate(binfo);
-        ret = bb_smscconn_receive(conn, msg);
-        if (ret == -1)
-            retmsg = octstr_create("Not accepted");
-        else
-            retmsg = octstr_create("Sent.");
+
+        /* re-encode content if necessary */
+        if (sms_charset_processing(charset, msg->sms.msgdata, msg->sms.coding) == -1) {
+            error(0, "HTTP[%s]: Charset or body misformed, rejected",
+                  octstr_get_cstr(conn->id));
+            retmsg = octstr_create("Charset or body misformed, rejected");
+        }
+        else {
+
+            ret = bb_smscconn_receive(conn, msg);
+            if (ret == -1)
+                retmsg = octstr_create("Not accepted");
+            else
+                retmsg = octstr_create("Sent.");
+        }
     }
 
     reply_headers = gwlist_create();

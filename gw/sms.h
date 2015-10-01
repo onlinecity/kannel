@@ -202,4 +202,11 @@ void prepend_catenation_udh(Msg *sms, int part_no, int num_messages, int msg_seq
  */
 int sms_priority_compare(const void *a, const void *b);
 
+/*
+ * Re-encode an SMSmessage , based on the 'charset' that defines the content
+ * encoding and the 'coding' that defines the desired target encoding.
+ * Return 0 on success, -1 otherwise.
+ */
+int sms_charset_processing(Octstr *charset, Octstr *body, int coding);
+
 #endif

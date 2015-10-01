@@ -150,8 +150,6 @@ static Timerset *timerset = NULL;
 /* Maximum requests that we handle in parallel */
 static Semaphore *max_pending_requests;
 
-int charset_processing (Octstr *charset, Octstr *text, int coding);
-
 /* for delayed HTTP answers.
  * Dict key is uuid, value is HTTPClient pointer
  * of open transaction
@@ -1152,7 +1150,7 @@ static void url_result_thread(void *arg)
             /*
              * Ensure now that we transcode to our internal encoding.
              */
-            if (charset_processing(charset, replytext, coding) == -1) {
+            if (sms_charset_processing(charset, replytext, coding) == -1) {
                 replytext = octstr_duplicate(reply_couldnotrepresent);
             }
             octstr_destroy(type);
@@ -2272,9 +2270,9 @@ static Octstr *smsbox_req_handle(URLTranslation *t, Octstr *client_ip,
     } else
 	msg->sms.smsc_id = NULL;
 
-    if (charset_processing(charset, msg->sms.msgdata, msg->sms.coding) == -1) {
-	returnerror = octstr_create("Charset or body misformed, rejected");
-	goto field_error;
+    if (sms_charset_processing(charset, msg->sms.msgdata, msg->sms.coding) == -1) {
+        returnerror = octstr_create("Charset or body misformed, rejected");
+        goto field_error;
     }
 
     msg->sms.meta_data = octstr_duplicate(meta_data);
@@ -3665,45 +3663,4 @@ int main(int argc, char **argv)
     gwlib_shutdown();
 
     return 0;
-}
-
-int charset_processing(Octstr *charset, Octstr *body, int coding)
-{
-    int resultcode = 0;
-
-	/*
-	debug("sms.http", 0, "%s: enter, charset=%s, coding=%d, msgdata is:",
-	      __func__, octstr_get_cstr(charset), coding);
-	octstr_dump(body, 0);
-	*/
-
-    if (octstr_len(charset)) {
-    	if (coding == DC_7BIT) {
-    		/*
-    		 * For 7 bit, convert to UTF-8
-    		 */
-    		if (charset_convert(body, octstr_get_cstr(charset), "UTF-8") < 0) {
-                error(0, "Failed to convert msgdata from charset <%s> to <%s>, will leave as is.",
-                	  octstr_get_cstr(charset), "UTF-8");
-    			resultcode = -1;
-    		}
-    	} else if (coding == DC_UCS2) {
-    		/*
-    		 * For UCS-2, convert to UTF-16BE
-    		 */
-    		if (charset_convert(body, octstr_get_cstr(charset), "UTF-16BE") < 0) {
-                error(0, "Failed to convert msgdata from charset <%s> to <%s>, will leave as is.",
-                	  octstr_get_cstr(charset), "UTF-16BE");
-    			resultcode = -1;
-    		}
-    	}
-    }
-
-	/*
-	debug("sms.http", 0, "%s: exit, charset=%s, coding=%d, msgdata is:",
-	      __func__, octstr_get_cstr(charset), coding);
-	octstr_dump(body, 0);
-	*/
-
-    return resultcode;
 }

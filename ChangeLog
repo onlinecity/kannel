@@ -1,3 +1,9 @@
+2015-10-01  Stipe Tolj  <stolj at kannel.org>
+    * gw/sms.[ch]: incubate function sms_charset_processing() into module.
+    * gw/smsbox.c: removed charset_processing().
+    * gw/smsc/smsc_http.c: fix missing 'charset' processing for type kannel
+      when receiving MOs.
+
 2015-09-25  Stipe Tolj  <stolj at kannel.org>
     * utils/mtbatch.c: add option -x to disallow injection of smsbox-id to MT
       messages, in order to let normal smsbox connection handle DLRs.
