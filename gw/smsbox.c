@@ -792,12 +792,21 @@ static void get_x_kannel_from_xml(int requesttype , Octstr **type, Octstr **body
     if (doc->encoding != NULL)
         *charset = octstr_create((const char*) doc->encoding);
     else
-	*charset = octstr_create("UTF-8");
+        *charset = octstr_create("UTF-8");
 
     /* text */
+    /* first try to receive type, default text */
+    tmp = NULL;
+    XPATH_SEARCH_OCTSTR("/message/submit/ud/@type", tmp, 0);
+    /* now receive message body */
     XPATH_SEARCH_OCTSTR("/message/submit/ud", text, 0);
-    if (text != NULL && octstr_hex_to_binary(text) == -1)
-        octstr_url_decode(text);
+    if (text != NULL) {
+        if (tmp != NULL && octstr_str_case_compare(tmp, "binary") == 0)
+            octstr_hex_to_binary(text);
+        else
+            octstr_url_decode(text);
+    }
+    octstr_destroy(tmp);
 
     octstr_truncate(*body, 0);
     if(text != NULL) {

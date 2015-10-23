@@ -1,3 +1,7 @@
+2015-10-23 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsbox.c: fixed xml post parsing. Check ud type and if not binary
+      don't try to hex decode.
+
 2015-10-01  Stipe Tolj  <stolj at kannel.org>
     * gw/sms.[ch]: incubate function sms_charset_processing() into module.
     * gw/smsbox.c: removed charset_processing().
