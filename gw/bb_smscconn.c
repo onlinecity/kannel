@@ -946,12 +946,12 @@ static long smsc2_find(Octstr *id, long start)
     SMSCConn *conn = NULL;
     long i;
 
-    if (start > gwlist_len(smsc_list) || start < 0)
+    if (start > gwlist_len(smsc_list) || start < 0 || id == NULL)
         return -1;
 
     for (i = start; i < gwlist_len(smsc_list); i++) {
         conn = gwlist_get(smsc_list, i);
-        if (conn != NULL && octstr_compare(conn->admin_id, id) == 0) {
+        if (conn != NULL && conn->admin_id != NULL && octstr_compare(conn->admin_id, id) == 0) {
             break;
         }
     }

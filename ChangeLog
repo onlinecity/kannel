@@ -1,3 +1,6 @@
+2015-11-16 Alexander Malysh <amalysh at kannel.org>
+    * gw/bb_smscconn.c: fixed crash in smsc2_find if id or admin_id is NULL.
+
 2015-10-23 Alexander Malysh <amalysh at kannel.org>
     * gw/smsbox.c: fixed xml post parsing. Check ud type and if not binary
       don't try to hex decode.
