@@ -160,9 +160,6 @@ case "$host" in
       CFLAGS="$CFLAGS -DDARWIN=1" 
     fi
     OLD_LIBTOOL="libtool -static -o"
-    # because if libiconv issue on OSX with MacPorts installed
-    # try to set system library path at the beginning
-    LIBS="$LIBS -L/usr/lib"
     ;;
   *-linux-*)
     CFLAGS="$CFLAGS -D_XOPEN_SOURCE=600 -D_BSD_SOURCE"
@@ -227,6 +224,7 @@ AC_CHECK_LIB(bind, inet_ntop)
 if test -z "$pthread"; then
     AC_CHECK_LIB(pthread, pthread_exit, [LIBS="$LIBS -lpthread"])
 fi
+AC_CHECK_LIB(iconv, libiconv, [LIBS="$LIBS -liconv"])
 
 dnl Checks for header files.
 
