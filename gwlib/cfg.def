@@ -653,8 +653,7 @@ SINGLE_GROUP(dlr-db,
 SINGLE_GROUP(store-db,
     OCTSTR(id)
     OCTSTR(table)
-    OCTSTR(field-uuid)
-    OCTSTR(field-message)
+    OCTSTR(hash)
 )
 
 

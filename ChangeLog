@@ -1,3 +1,17 @@
+2015-12-14  Stipe Tolj  <stolj at kannel.org>
+    * doc/examples/store-redis.conf: add documentation for the 'hash' config
+      directive in the 'group = store-db' context.
+    * gw/bb_store_redis.c: use redis with binds list and implement an 'hash'
+      mode that allows for readable object in the redis store, rather then the
+      string blobs as sinle key/value pair.
+    * gw/dlr_redis.c: use the binds list values.
+    * gwlib/cfg.def: add 'hash' config directive to 'group = store-db' context.
+    * gwlib/dbpool_redis.c: implement the usage of redisCommandArgv() with the
+      binds values via the list.
+    This patchset re-writes some parts of the redis support modules, mainly to
+    support the more generic redisCommandArgv() API call that makes things
+    more robust internally.
+
 2015-11-16 Alexander Malysh <amalysh at kannel.org>
     * gw/bb_smscconn.c: fixed crash in smsc2_find if id or admin_id is NULL.
 
