@@ -270,6 +270,8 @@ void dlr_init(Cfg* cfg)
         handles = dlr_init_sqlite3(cfg);
     } else if (octstr_compare(dlr_type, octstr_imm("redis")) == 0) {
         handles = dlr_init_redis(cfg);
+    } else if (octstr_compare(dlr_type, octstr_imm("cassandra")) == 0) {
+        handles = dlr_init_cass(cfg);
     }
 
     /*

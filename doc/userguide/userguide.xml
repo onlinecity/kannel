@@ -668,6 +668,15 @@
                 
                 Where to look for the hiredis library and header files.</para></listitem>
 
+        <listitem><para><literal>--with-cassandra</literal>
+                
+            Enable using Cassandra for DBPool and DLR support. Requires the DataStax C/C++ driver for 
+            Apache Cassandra.</para></listitem>
+            
+            <listitem><para><literal>--with-cassandra-dir=</literal><replaceable>DIR</replaceable>
+                
+                Where to look for the DataStax C/C++ Cassandra library and header files.</para></listitem>
+
 	<!-- XXX DAVI add openssl and others in here -->
 
 	</itemizedlist>
@@ -1617,8 +1626,9 @@ admin-password = f00bar
         <literal>sdb</literal>,
         <literal>mssql</literal>,
         <literal>sqlite3</literal>,
-        <literal>oracle</literal> and
-        <literal>redis</literal>.
+        <literal>oracle</literal>,
+        <literal>redis</literal> and
+        <literal>cassandra</literal>.
         By default this is set to <literal>internal</literal>.
      </entry></row>
 
@@ -6060,6 +6070,46 @@ field-boxc-id = boxc
             </table>
         </sect3>
 	</sect2>
+
+    <sect2>
+        <title>Cassandra DLR storage</title>
+        <para>To store DLR information using Cassandra (http://cassandra.apache.org/) database, you should set the
+            <literal>dlr-storage = cassandra</literal> configuration directive in the
+            <literal>core</literal> group.
+        </para>
+        <para>In addition, you must have a <literal>dlr-db</literal> group defined that specifies 
+            the field names that are used to store the DLR attributes and a 
+            <literal>cassandra-connection</literal> group that defines the connection to Cassandra.
+        </para>
+        <para>Here is the example configuration from
+            <literal>doc/examples/dlr-cassandra.conf</literal>:
+            
+            <programlisting>
+                group = cassandra-connection
+                id = mydlr
+                host = localhost
+                #username = foo
+                #password = bar
+                #database = dlr
+                max-connections = 1
+                
+                group = dlr-db
+                id = mydlr
+                ttl = 604800
+                table = dlr
+                field-smsc = smsc
+                field-timestamp = ts
+                field-destination = destination
+                field-source = source
+                field-service = service
+                field-url = url
+                field-mask = mask
+                field-status = status
+                field-boxc-id = boxc
+            </programlisting>
+            
+        </para>
+    </sect2>
     
         <sect2>
 	<title>DLR database field configuration</title>

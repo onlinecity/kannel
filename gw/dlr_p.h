@@ -176,6 +176,7 @@ struct dlr_storage *dlr_init_pgsql(Cfg *cfg);
 struct dlr_storage *dlr_init_mssql(Cfg *cfg);
 struct dlr_storage *dlr_init_sqlite3(Cfg *cfg);
 struct dlr_storage *dlr_init_redis(Cfg *cfg);
+struct dlr_storage *dlr_init_cass(Cfg *cfg);
 
 
 #endif /* DLR_P_H */

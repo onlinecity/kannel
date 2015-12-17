@@ -1364,6 +1364,49 @@ AC_ARG_WITH(mssql,
     AC_MSG_RESULT(disabled)
 ])
 
+dnl Implement the --with-cassandra option. This will set HAVE_CASS in gw-config.h
+
+AC_MSG_CHECKING([whether to compile with Cassandra support])
+AC_ARG_WITH(cassandra,
+[  --with-cassandra            enable Cassandra storage @<:@disabled@:>@], [
+if test "$withval" != yes ; then
+    AC_MSG_RESULT(disabled)
+else
+    dnl Implement the --with-cassandra-dir option.
+    AC_ARG_WITH(cassandra-dir,
+    [  --with-cassandra-dir=DIR    where to look for Cassandra libs and header files
+                          DIR points to the installation @<:@/usr/local@:>@],
+    [
+        cassloc=""
+        if test -d "$withval" ; then
+        cassloc="$withval"
+        fi
+    ])
+    
+    AC_MSG_RESULT(searching)
+    found=""
+    for loc in $cassloc /usr /usr/local ; do
+        if test "x$found" = "x" ; then
+            AC_MSG_CHECKING([for Cassandra include files in])
+            AC_MSG_RESULT($loc)
+            AC_CHECK_FILE("$loc/include/cassandra.h",
+              [CFLAGS="$CFLAGS -I$loc/include"; LIBS="$LIBS -L$loc/lib -lcassandra"]; found=1
+            )
+        fi
+    done
+    if test "x$found" != "x1" ; then
+        AC_MSG_ERROR([Unable to find cassandra.h, please provide a --with-cassandra-dir=<dir> location])
+    fi
+    AC_CHECK_HEADERS(cassandra.h)
+    AC_DEFINE(HAVE_CASS)
+    AC_MSG_CHECKING([whether to compile with Cassandra support])
+    AC_MSG_RESULT(yes)
+    CASS="yes"
+fi
+],[
+  AC_MSG_RESULT(disabled)
+])
+
 
 dnl Implement the --with-wtls option.
 dnl Check to see if we should include WTLS support, and which library to use.

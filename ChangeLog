@@ -1,3 +1,19 @@
+2015-12-17  Stipe Tolj  <stolj at kannel.org>
+    * doc/examples/dlr-cassandra.conf: example for Cassandra.
+    * doc/userguide/userguide.xml: documentation for Cassandra support.
+    * gw/dlr_cass.c: adding DLR handling via Cassandra.
+    * gw/dlr_p.h: adding dlr_init_cass() prototype.
+    * gw/dlr.c: add 'spool = cassandra'.
+    * gwlib/cfg.def: adding 'group = cassandra-connection' context.
+    * gwlib/dbpool_cass.c: adding Cassandra DBPool support via DataStax C/C++
+      Cassandra driver library.
+    * gwlib/dbpool.[ch]: include Cassandra handling.
+    * test/test_dbpool.c: add Cassandra testing capabilities.
+    * configure[.in]: adding --with-cassandra and --with-cassandra-dir
+    * gw-config.h.in: define HAVE_CASS
+    This patchset adds support for the Apache Cassandra 2.1, 2.2 and 3.0
+    database engine. Initially DLRs can be stored in the database.
+     
 2015-12-14  Stipe Tolj  <stolj at kannel.org>
     * doc/examples/store-redis.conf: add documentation for the 'hash' config
       directive in the 'group = store-db' context.

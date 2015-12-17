@@ -842,6 +842,8 @@ with_pgsql_dir
 with_redis
 with_redis_dir
 with_mssql
+with_cassandra
+with_cassandra_dir
 with_wtls
 with_gsoap
 '
@@ -1545,6 +1547,9 @@ Optional Packages:
   --with-redis-dir=DIR    where to look for Redis libs and header files
                           DIR points to the installation [/usr/local/redis]
   --with-mssql=DIR        enable FreeTDS Ct-Lib storage support [disabled]
+                          DIR points to the installation [/usr/local]
+  --with-cassandra            enable Cassandra storage [disabled]
+  --with-cassandra-dir=DIR    where to look for Cassandra libs and header files
                           DIR points to the installation [/usr/local]
   --with-wtls[=TYPE]      select WTLS version to use: [openssl|baltimore]
   --with-gsoap[=DIR]      enable gSOAP web services SMSC module support [disabled]
@@ -19278,6 +19283,94 @@ $as_echo "yes" >&6; }
 else
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
+$as_echo "disabled" >&6; }
+
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to compile with Cassandra support" >&5
+$as_echo_n "checking whether to compile with Cassandra support... " >&6; }
+
+# Check whether --with-cassandra was given.
+if test "${with_cassandra+set}" = set; then :
+  withval=$with_cassandra;
+if test "$withval" != yes ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
+$as_echo "disabled" >&6; }
+else
+
+# Check whether --with-cassandra-dir was given.
+if test "${with_cassandra_dir+set}" = set; then :
+  withval=$with_cassandra_dir;
+        cassloc=""
+        if test -d "$withval" ; then
+        cassloc="$withval"
+        fi
+
+fi
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: searching" >&5
+$as_echo "searching" >&6; }
+    found=""
+    for loc in $cassloc /usr /usr/local ; do
+        if test "x$found" = "x" ; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Cassandra include files in" >&5
+$as_echo_n "checking for Cassandra include files in... " >&6; }
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: $loc" >&5
+$as_echo "$loc" >&6; }
+            as_ac_File=`$as_echo "ac_cv_file_"$loc/include/cassandra.h"" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for \"$loc/include/cassandra.h\"" >&5
+$as_echo_n "checking for \"$loc/include/cassandra.h\"... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r ""$loc/include/cassandra.h""; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  CFLAGS="$CFLAGS -I$loc/include"; LIBS="$LIBS -L$loc/lib -lcassandra"; found=1
+
+fi
+
+        fi
+    done
+    if test "x$found" != "x1" ; then
+        as_fn_error $? "Unable to find cassandra.h, please provide a --with-cassandra-dir=<dir> location" "$LINENO" 5
+    fi
+    for ac_header in cassandra.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "cassandra.h" "ac_cv_header_cassandra_h" "$ac_includes_default"
+if test "x$ac_cv_header_cassandra_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CASSANDRA_H 1
+_ACEOF
+
+fi
+
+done
+
+    $as_echo "#define HAVE_CASS 1" >>confdefs.h
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to compile with Cassandra support" >&5
+$as_echo_n "checking whether to compile with Cassandra support... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+    CASS="yes"
+fi
+
+else
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
 $as_echo "disabled" >&6; }
 
 fi
