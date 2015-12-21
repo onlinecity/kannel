@@ -1,3 +1,6 @@
+2015-12-21 Alexander Malysh <amalysh at kannel.org>
+    * gw/bb_smscconn.c: fixed MO concatenation handling for rerouting cases.
+
 2015-12-17  Stipe Tolj  <stolj at kannel.org>
     * doc/examples/dlr-mysql.conf: add comment block describing an advanced
       configuraiton for MySQL with scheduled events for DLR table clean-up.
