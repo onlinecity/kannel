@@ -1,3 +1,7 @@
+2015-12-22 Alexander Malysh <amalysh at kannel.org>
+    * gwlib/conn.[ch]: renamed some ssl init functions to be in conn_XXX namespace.
+      test/test_http.c: implemented cmd line option to provide CA file.
+
 2015-12-21 Alexander Malysh <amalysh at kannel.org>
     * gw/bb_smscconn.c: fixed MO concatenation handling for rerouting cases.
 

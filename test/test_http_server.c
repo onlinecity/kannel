@@ -472,7 +472,7 @@ int main(int argc, char **argv) {
      */
     if (ssl) {
         if (ssl_server_cert_file != NULL && ssl_server_key_file != NULL) {
-            use_global_server_certkey_file(ssl_server_cert_file, ssl_server_key_file);
+            conn_use_global_server_certkey_file(ssl_server_cert_file, ssl_server_key_file);
             octstr_destroy(ssl_server_cert_file);
             octstr_destroy(ssl_server_key_file);
         } else {

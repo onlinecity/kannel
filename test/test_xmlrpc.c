@@ -384,7 +384,7 @@ int main(int argc, char **argv)
      */
     if (ssl || proxy_ssl) {
         if (ssl_client_certkey_file != NULL) {
-            use_global_client_certkey_file(ssl_client_certkey_file);
+            conn_use_global_client_certkey_file(ssl_client_certkey_file);
         } else {
             panic(0, "client certkey file need to be given!");
         }

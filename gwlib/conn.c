@@ -1354,7 +1354,7 @@ void server_shutdown_ssl(void)
     EVP_cleanup();
 }
 
-void use_global_client_certkey_file(Octstr *certkeyfile)
+void conn_use_global_client_certkey_file(Octstr *certkeyfile)
 { 
     SSL_CTX_use_certificate_chain_file(global_ssl_context, 
                                        octstr_get_cstr(certkeyfile));
@@ -1369,7 +1369,7 @@ void use_global_client_certkey_file(Octstr *certkeyfile)
          octstr_get_cstr(certkeyfile));
 }
 
-void use_global_server_certkey_file(Octstr *certfile, Octstr *keyfile) 
+void conn_use_global_server_certkey_file(Octstr *certfile, Octstr *keyfile) 
 {
     SSL_CTX_use_certificate_chain_file(global_server_ssl_context, 
                                        octstr_get_cstr(certfile));
@@ -1403,25 +1403,25 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
     return preverify_ok;
 }
 
-void use_global_trusted_ca_file(Octstr *ssl_trusted_ca_file)
+void conn_use_global_trusted_ca_file(Octstr *ssl_trusted_ca_file)
 {
     if (ssl_trusted_ca_file != NULL) {
-	if (!SSL_CTX_load_verify_locations(global_ssl_context,
-					   octstr_get_cstr(ssl_trusted_ca_file),
-					   NULL)) {
-	    panic(0, "Failed to load SSL CA file: %s", octstr_get_cstr(ssl_trusted_ca_file));
-	} else {
-	    info(0, "Using CA root certificates from file %s",
-		 octstr_get_cstr(ssl_trusted_ca_file));
-	    SSL_CTX_set_verify(global_ssl_context,
-			       SSL_VERIFY_PEER,
-			       verify_callback);
-	}
-	
+        if (!SSL_CTX_load_verify_locations(global_ssl_context,
+                octstr_get_cstr(ssl_trusted_ca_file),
+                NULL)) {
+            panic(0, "Failed to load SSL CA file: %s", octstr_get_cstr(ssl_trusted_ca_file));
+        } else {
+            info(0, "Using CA root certificates from file %s",
+                    octstr_get_cstr(ssl_trusted_ca_file));
+            SSL_CTX_set_verify(global_ssl_context,
+                    SSL_VERIFY_PEER,
+                    verify_callback);
+        }
+
     } else {
-	SSL_CTX_set_verify(global_ssl_context,
-			   SSL_VERIFY_NONE,
-			   NULL);
+        SSL_CTX_set_verify(global_ssl_context,
+                SSL_VERIFY_NONE,
+                NULL);
     }
 }
 
@@ -1439,19 +1439,19 @@ void conn_config_ssl (CfgGroup *grp)
      */    
     ssl_client_certkey_file = cfg_get(grp, octstr_imm("ssl-client-certkey-file"));
     if (ssl_client_certkey_file != NULL) 
-        use_global_client_certkey_file(ssl_client_certkey_file);
+        conn_use_global_client_certkey_file(ssl_client_certkey_file);
     
     ssl_server_cert_file = cfg_get(grp, octstr_imm("ssl-server-cert-file"));
     ssl_server_key_file = cfg_get(grp, octstr_imm("ssl-server-key-file"));
     
     if (ssl_server_cert_file != NULL && ssl_server_key_file != NULL) {
-        use_global_server_certkey_file(ssl_server_cert_file, 
+        conn_use_global_server_certkey_file(ssl_server_cert_file, 
 				       ssl_server_key_file);
     }
 
     ssl_trusted_ca_file = cfg_get(grp, octstr_imm("ssl-trusted-ca-file"));
     
-    use_global_trusted_ca_file(ssl_trusted_ca_file);
+    conn_use_global_trusted_ca_file(ssl_trusted_ca_file);
 
     octstr_destroy(ssl_client_certkey_file);
     octstr_destroy(ssl_server_cert_file);

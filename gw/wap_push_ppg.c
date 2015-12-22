@@ -70,7 +70,7 @@
  *
  * In addition, RFCs 1521 and 2045 are referred.
  *
- * By Aarno SyväŠnen for Wapit Ltd, Wiral Ltd and Global Networks Inc. 
+ * By Aarno Syvï¿½nen for Wapit Ltd, Wiral Ltd and Global Networks Inc. 
  */
 
 #include <time.h>
@@ -552,7 +552,7 @@ static int read_ppg_config(Cfg *cfg)
      if (ppg_ssl_port != NO_HTTPS_PORT) {
         if (ssl_server_cert_file == NULL || ssl_server_key_file == NULL) 
             panic(0, "cannot continue without server cert and/or key files");
-        use_global_server_certkey_file(ssl_server_cert_file, ssl_server_key_file);
+        conn_use_global_server_certkey_file(ssl_server_cert_file, ssl_server_key_file);
      }        
      octstr_destroy(ssl_server_cert_file);
      octstr_destroy(ssl_server_key_file);
@@ -805,7 +805,7 @@ static void pap_request_thread(void *arg)
                        octstr_get_cstr(url), octstr_get_cstr(ip));
                  goto ferror;
             }
-        } else {                        /* Jörg, this wont disappear again */
+        } else {                        /* Jï¿½rg, this wont disappear again */
 	    username = octstr_imm("");
 	}
 
