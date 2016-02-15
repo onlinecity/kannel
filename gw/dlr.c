@@ -525,6 +525,16 @@ Msg* create_dlr_from_msg(const Octstr *smsc, const Msg *msg, const Octstr *reply
     time(&dlrmsg->sms.time);
     dlrmsg->sms.meta_data = octstr_duplicate(msg->sms.meta_data);
 
+    /* add original DLR bit-mask, as we do in dlr_find() */
+    if (DLR_IS_ENABLED(msg->sms.dlr_mask)) {
+        Octstr *dlr_mask = octstr_format("%ld", msg->sms.dlr_mask);
+        if (dlrmsg->sms.meta_data == NULL)
+            dlrmsg->sms.meta_data = octstr_create("");
+        meta_data_set_value(dlrmsg->sms.meta_data, METADATA_ORIG_MSG_GROUP,
+                            octstr_imm(METADATA_ORIG_MSG_GROUP_DLR_MASK), dlr_mask, 1);
+        octstr_destroy(dlr_mask);
+    }
+
     debug("dlr.dlr", 0,"SMSC[%s]: DLR = %s",
                 (smsc ? octstr_get_cstr(smsc) : "UNKNOWN"),
                 (dlrmsg->sms.dlr_url ? octstr_get_cstr(dlrmsg->sms.dlr_url) : ""));

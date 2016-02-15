@@ -1,3 +1,7 @@
+2016-02-15  Stipe Tolj  <stolj at kannel.org>
+    * gw/dlr.c: add missing original DLR bit-mask forwarding in case of 
+      DLR SMSC[SUCCESS|FAIL] events.
+      
 2015-12-22 Alexander Malysh <amalysh at kannel.org>
     * gwlib/conn.[ch]: renamed some ssl init functions to be in conn_XXX namespace.
       test/test_http.c: implemented cmd line option to provide CA file.
