@@ -381,7 +381,7 @@ Octstr *urltrans_fill_escape_codes(Octstr *pattern, Msg *request)
         }
         break;
 
-    case 'b':
+    case 'b':   /* message payload, URL-encoded */
         enc = octstr_duplicate(request->sms.msgdata);
         octstr_url_encode(enc);
         octstr_append(result, enc);
@@ -432,6 +432,15 @@ Octstr *urltrans_fill_escape_codes(Octstr *pattern, Msg *request)
         if (octstr_len(request->sms.meta_data)) {
             enc = octstr_duplicate(request->sms.meta_data);
             octstr_url_encode(enc);
+            octstr_append(result, enc);
+            octstr_destroy(enc);
+        }
+        break;
+
+    case 'e':   /* message payload, printable hexadecimal byte codes */
+        if (octstr_len(request->sms.msgdata)) {
+            enc = octstr_duplicate(request->sms.msgdata);
+            octstr_binary_to_hex(enc, 1);
             octstr_append(result, enc);
             octstr_destroy(enc);
         }

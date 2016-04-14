@@ -7203,7 +7203,12 @@ squeezed to one
 </entry></row>
 
 <row><entry><literal>%b</literal></entry><entry>
-the original SMS message, in a binary form
+the original SMS message, in a binary form (URL-encoded)
+</entry></row>
+
+<row><entry><literal>%e</literal></entry><entry>
+the original SMS message, in a binary form (printable hexadecimal byte codes). 
+I.e. "xyz" would be send as byte codes "78797A".
 </entry></row>
 
 <row><entry><literal>%t</literal></entry><entry>
