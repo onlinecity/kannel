@@ -1539,31 +1539,32 @@ static Msg *handle_dlr(SMPP *smpp, Octstr *destination_addr, Octstr *short_messa
                 dlr_err = octstr_create(err_cstr);
                 octstr_strip_blanks(dlr_err);
             } else {
-                debug("bb.sms.smpp", 0, "SMPP[%s]: Couldnot parse DLR string sscanf way,"
+                debug("bb.sms.smpp", 0, "SMPP[%s]: Could not parse DLR string sscanf way, "
                       "fallback to old way. Please report!", octstr_get_cstr(smpp->conn->id));
 
                 /* only if not already here */
                 if (msgid == NULL) {
                     if ((curr = octstr_search(respstr, octstr_imm("id:"), 0)) != -1) {
-                        vpos = octstr_search_char(respstr, ' ', curr);
-                        if ((vpos-curr >0) && (vpos != -1))
+                        if ((vpos = octstr_search_char(respstr, ' ', curr)) == -1)
+                            vpos = octstr_len(respstr);
+                        if (vpos-curr > 0)
                             msgid = octstr_copy(respstr, curr+3, vpos-curr-3);
-                    } else {
-                        msgid = NULL;
                     }
                 }
 
                 /* get err & status code */
                 if ((curr = octstr_search(respstr, octstr_imm("stat:"), 0)) != -1) {
-                    vpos = octstr_search_char(respstr, ' ', curr);
-                    if ((vpos-curr >0) && (vpos != -1))
+                    if ((vpos = octstr_search_char(respstr, ' ', curr)) == -1)
+                        vpos = octstr_len(respstr);
+                    if (vpos-curr > 0)
                         stat = octstr_copy(respstr, curr+5, vpos-curr-5);
                 } else {
                     stat = NULL;
                 }
                 if ((curr = octstr_search(respstr, octstr_imm("err:"), 0)) != -1) {
-                    vpos = octstr_search_char(respstr, ' ', curr);
-                    if ((vpos-curr >0) && (vpos != -1))
+                    if ((vpos = octstr_search_char(respstr, ' ', curr)) == -1)
+                        vpos = octstr_len(respstr);
+                    if (vpos-curr > 0)
                         dlr_err = octstr_copy(respstr, curr+4, vpos-curr-4);
                 } else {
                     dlr_err = NULL;

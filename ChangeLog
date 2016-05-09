@@ -1,3 +1,7 @@
+2016-05-09  Stipe Tolj  <stolj at kannel.org>
+    * gw/smsc/smsc_smpp.c: relax SMPP DLR scanning for a better pattern match.
+    [Msg-Id: <5720AAD1.2000500@kannel.org>]
+    
 2016-04-14  Stipe Tolj  <stolj at kannel.org>
     * doc/userguide/userguide.xml: add documentation for escape code '%e'.
     * gw/urltrans.c: add escape code '%e' for printable hexadecimal byte codes.
