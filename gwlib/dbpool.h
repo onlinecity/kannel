@@ -67,7 +67,8 @@
 #if defined(HAVE_MYSQL) || defined(HAVE_SDB) || \
     defined(HAVE_ORACLE) || defined(HAVE_SQLITE) || \
     defined(HAVE_PGSQL) || defined(HAVE_SQLITE3) || \
-    defined(HAVE_MSSQL) || defined(HAVE_REDIS)
+    defined(HAVE_MSSQL) || defined(HAVE_REDIS) || \
+    defined(HAVE_CASS)
 #define HAVE_DBPOOL 1
 #endif
 

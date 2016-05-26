@@ -1,3 +1,6 @@
+2016-05-26  Stipe Tolj  <stolj at kannel.org>
+    * gwlib/dbpool.h: add missing define for Cassandra.
+    
 2016-05-09  Stipe Tolj  <stolj at kannel.org>
     * gw/smsc/smsc_smpp.c: relax SMPP DLR scanning for a better pattern match.
     [Msg-Id: <5720AAD1.2000500@kannel.org>]
