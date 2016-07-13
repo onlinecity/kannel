@@ -1,3 +1,8 @@
+2016-07-13  Stipe Tolj  <stolj at kannel.org>
+    * gwlib/dbpool_mysql.c: fix error code handling for mysql_stmt_execute(). 
+      The function returns CR_ error codes, we need to call _stmt_errno() to get
+      the server side ER_ error codes and retry on temporary ones.
+       
 2016-05-26  Stipe Tolj  <stolj at kannel.org>
     * gwlib/dbpool.h: add missing define for Cassandra.
     

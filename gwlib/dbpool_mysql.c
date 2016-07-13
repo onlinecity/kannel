@@ -74,8 +74,21 @@
  * Add more error codes if applicable from mysql's
  * <include>/mysq/mysqld_errno.h header file
  */
-#define MYSQL_ER_TEMP(rc) \
-    (rc == ER_LOCK_WAIT_TIMEOUT || rc == ER_LOCK_DEADLOCK)
+static inline int mysql_er_temp(const int rc)
+{
+    switch (rc) {
+    case ER_LOCK_WAIT_TIMEOUT:
+    case ER_LOCK_DEADLOCK:
+    case ER_GET_TEMPORARY_ERRMSG:
+        return 1;
+        break;
+    default:
+        return 0;
+        break;
+    }
+
+    return 0;
+}
 
 
 static void *mysql_open_conn(const DBConf *db_conf)
@@ -350,15 +363,18 @@ static int mysql_update(void *conn, const Octstr *sql, List *binds)
     /* execute statement */
 retry:
     ret = mysql_stmt_execute(stmt);
-    if (MYSQL_ER_TEMP(ret)) {
-        warning(0, "MYSQL: mysql_stmt_execute() failed: `%s'. Retrying.", mysql_stmt_error(stmt));
-        goto retry;
-    }
-    else if (ret != 0) {
-        error(0, "MYSQL: mysql_stmt_execute() failed: `%s'", mysql_stmt_error(stmt));
-        gw_free(bind);
-        mysql_stmt_close(stmt);
-        return -1;
+    if (ret != 0) {
+        ret = mysql_stmt_errno(stmt);
+        if (mysql_er_temp(ret)) {
+            warning(0, "MYSQL: mysql_stmt_execute() failed: %d: `%s'. Retrying.", ret, mysql_stmt_error(stmt));
+            goto retry;
+        }
+        else {
+            error(0, "MYSQL: mysql_stmt_execute() failed: %d: `%s'", ret, mysql_stmt_error(stmt));
+            gw_free(bind);
+            mysql_stmt_close(stmt);
+            return -1;
+        }
     }
     gw_free(bind);
 
