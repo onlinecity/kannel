@@ -1,3 +1,7 @@
+2016-07-14 Alexander Malysh <amalysh at kannel.org>
+    * gw/load.[ch]: Changed precision timing to microsec.
+      Thanks to kneodev at gmail.com for initial patch.
+
 2016-07-13  Stipe Tolj  <stolj at kannel.org>
     * gwlib/dbpool_mysql.c: fix error code handling for mysql_stmt_execute(). 
       The function returns CR_ error codes, we need to call _stmt_errno() to get

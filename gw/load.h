@@ -102,11 +102,12 @@ void load_destroy(Load *load);
 /**
  * Get measured load value at position @pos.
  */
-float load_get(Load *load, int pos);
+double load_get(Load *load, int pos);
 
 /**
  * Get length of intervals.
  */
 int load_len(Load *load);
+
 
 #endif
