@@ -1,4 +1,7 @@
 2016-08-04 Alexander Malysh <amalysh at kannel.org>
+    * gw/dlr.[ch]: added DLR_EXPIRED and DLR_UNKNOWN dlr mask
+
+2016-08-04 Alexander Malysh <amalysh at kannel.org>
     * gwlib/gwthread-pthread.c: fixed memory leak and panic if new thread could
       not be created
 
