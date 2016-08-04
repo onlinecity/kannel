@@ -1,3 +1,7 @@
+2016-08-04 Alexander Malysh <amalysh at kannel.org>
+    * gwlib/gwthread-pthread.c: fixed memory leak and panic if new thread could
+      not be created
+
 2016-07-14 Alexander Malysh <amalysh at kannel.org>
     * gw/load.[ch]: Changed precision timing to microsec.
       Thanks to kneodev at gmail.com for initial patch.
