@@ -1,4 +1,7 @@
 2016-08-04 Alexander Malysh <amalysh at kannel.org>
+    * gwlib/xmlrpc.c: fixed crash if wrong formated xml given
+
+2016-08-04 Alexander Malysh <amalysh at kannel.org>
     * gw/dlr.[ch]: added DLR_EXPIRED and DLR_UNKNOWN dlr mask
 
 2016-08-04 Alexander Malysh <amalysh at kannel.org>
