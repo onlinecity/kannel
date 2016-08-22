@@ -82,10 +82,9 @@ struct load {
 
 static double microtime(double *p) {
     struct timeval tv;
-    struct timezone tz;
     double result;
 
-    gettimeofday(&tv, &tz);
+    gettimeofday(&tv, NULL);
     result = tv.tv_sec + (1e-6 * tv.tv_usec);
     
     if(p != NULL) {
@@ -166,6 +165,7 @@ void load_increase_with(Load *load, unsigned long value)
     
     if (load == NULL)
         return;
+
     gw_rwlock_wrlock(load->lock);
     microtime(&now);
     for (i = 0; i < load->len; i++) {
@@ -210,6 +210,7 @@ double load_get(Load *load, int pos)
         double diff = (now - entry->last);
         if (diff == 0) diff = 1;
         ret = entry->curr/diff;
+        ret = (ret > entry->curr ? entry->curr : ret);
     }
     gw_rwlock_unlock(load->lock);
 
