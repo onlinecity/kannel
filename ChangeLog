@@ -1,3 +1,7 @@
+2016-10-26 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsc/smpp_pdu.c: applied patch that fixes memory leak if TLV is sent twice.
+      Thanks to Donald for this patch.
+
 2016-08-22 Alexander Malysh <amalysh at kannel.org>
     * gw/load.c: fixed load calculation
 

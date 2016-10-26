@@ -598,6 +598,11 @@ SMPP_PDU *smpp_pdu_unpack(Octstr *smsc_id, Octstr *data_without_len)
                         pos += opt_len; \
                         continue; \
                     } \
+                    if(p->mname != NULL) { \
+                        warning(0, "SMPP: Optional field (%s) was sent more than once, overwriting", #mname); \
+                        octstr_destroy(p->mname); \
+                        p->mname = NULL; \
+                    } \
                     copy_until_nul(#mname, data_without_len, &pos, opt_len, &p->mname); \
                     if (tlv != NULL) dict_put(p->tlv, tlv->name, octstr_duplicate(p->mname)); \
                 } else
@@ -609,6 +614,11 @@ SMPP_PDU *smpp_pdu_unpack(Octstr *smsc_id, Octstr *data_without_len)
                             #mname, opt_len, min_len, max_len);  \
                         pos += opt_len; \
                         continue; \
+                    } \
+                    if(p->mname != NULL) { \
+                        warning(0, "SMPP: Optional field (%s) was sent more than once, overwriting", #mname); \
+                        octstr_destroy(p->mname); \
+                        p->mname = NULL; \
                     } \
                     p->mname = octstr_copy(data_without_len, pos, opt_len); \
                     pos += opt_len; \
