@@ -2187,7 +2187,7 @@ static Octstr *smsbox_req_handle(URLTranslation *t, Octstr *client_ip,
 	msg->sms.dlr_url = octstr_create("");
     }
 
-    if ( dlr_mask < -1 || dlr_mask > 63 ) { /* 00111111 */
+    if ( dlr_mask < -1 || dlr_mask > 66 ) { /* 01000010 */
 	returnerror = octstr_create("DLR-Mask field misformed, rejected");
 	goto field_error;
     }

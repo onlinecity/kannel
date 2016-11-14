@@ -1,3 +1,7 @@
+2016-11-14 Alexander Malysh <amalysh at kannel.org>
+    * gw/smsbox.c, gw/smsc/smsc_cimd2.c, gw/smsc/smsc_smpp.c: applied patch to support
+      DLR_EXPIRED. Thanks to Iwan Iwanowicz <iwan41 at gmail.com> for the patch.
+
 2016-10-26 Alexander Malysh <amalysh at kannel.org>
     * gw/smsc/smpp_pdu.c: applied patch that fixes memory leak if TLV is sent twice.
       Thanks to Donald for this patch.

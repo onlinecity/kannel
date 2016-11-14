@@ -1477,6 +1477,8 @@ static Msg *handle_dlr(SMPP *smpp, Octstr *destination_addr, Octstr *short_messa
             dlrstat = DLR_SUCCESS;
             break;
         case 3: /* EXPIRED */
+	    dlrstat = DLR_EXPIRED;
+	    break;
         case 4: /* DELETED */
         case 5: /* UNDELIVERABLE */
         case 7: /* UNKNOWN */
