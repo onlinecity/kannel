@@ -3476,7 +3476,8 @@ address-range = ""
    <row><entry><literal>use-ssl</literal></entry>
      <entry><literal>bool</literal></entry>
      <entry valign="bottom">
-        Defines whether we should try to bind with SSL enabled connection.
+        Defines whether we should try to bind with SSL enabled connection
+        to create a SSMPP (secure SMPP) session.
      </entry></row>
 
     <row><entry><literal>ssl-client-certkey-file (c)</literal></entry>

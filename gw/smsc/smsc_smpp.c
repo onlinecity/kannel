@@ -2771,8 +2771,8 @@ int smsc_smpp_create(SMSCConn *conn, CfgGroup *grp)
 #endif
 
     conn->data = smpp;
-    conn->name = octstr_format("SMPP:%S:%d/%d:%S:%S",
-                               host, port,
+    conn->name = octstr_format("%sSMPP:%S:%d/%d:%S:%S",
+                               (smpp->use_ssl ? "S" : ""), host, port,
                                (!receive_port && transceiver_mode  ? port : receive_port),
                                username, system_type);
 
